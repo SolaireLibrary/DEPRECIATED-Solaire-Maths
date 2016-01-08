@@ -32,7 +32,7 @@
 */
 
 #include <cstdint>
-#include "..\Core\Maths.hpp"
+#include "Solaire\Core\Maths.hpp"
 
 namespace Solaire {
 

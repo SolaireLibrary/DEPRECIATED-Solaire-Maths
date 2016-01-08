@@ -25,10 +25,9 @@
 	\author
 	Created			: Adam Smith
 	Last modified	: Adam Smith
-	\version 2.0
 	\date
 	Created			: 23rd September 2015
-	Last Modified	: 5th January 2016
+	Last Modified	: 8th January 2016
 */
 
 #include <cmath>
@@ -36,11 +35,19 @@
 #include <cstring>
 #include <initializer_list>
 
-namespace Solaire{
+namespace Solaire {
 
-	template<class T, const uint32_t WIDTH, const uint32_t HEIGHT>
-	class Matrix;
+    template<class Scalar, const uint32_t WIDTH, const uint32_t HEIGHT>
+    class Matrix;
 
+    /*!
+        \class Vector
+        \brief
+        \detail
+        \tparam T The type of the scalar elements in this Vector.
+        \tparam LENGTH The number of elements in this Vector.
+        \version 1.0.0
+    */
 	template<class T, const uint32_t LENGTH>
 	class Vector{
 	public:
@@ -49,12 +56,12 @@ namespace Solaire{
 		    Length = LENGTH     //!< The number of elements in this Vector.
 		};
     private:
-        Scalar mData[Length];
+        Scalar mData[Length];   //!< Stores the scalar elements of this Vector.
 	public:
 	    // Constructors & Destructor
 
         /*!
-            \brief Create a new vector.
+            \brief Create a new Vector.
             \detail All elements will be initialised to 0.
         */
 	    Vector() throw() {
@@ -369,165 +376,7 @@ namespace Solaire{
 		}
 	};
 
-	// Vector / Vector
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length>& operator+=(Vector<Scalar, Length>& aFirst, const Vector<Scalar, Length> aSecond) {
-	    for(uint32_t i = 0; i < Length; ++i) {
-            aFirst[i] += aSecond[i];
-	    }
-	    return aFirst;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length>& operator-=(Vector<Scalar, Length>& aFirst, const Vector<Scalar, Length> aSecond) {
-	    for(uint32_t i = 0; i < Length; ++i) {
-            aFirst[i] -= aSecond[i];
-	    }
-	    return aFirst;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length>& operator*=(Vector<Scalar, Length>& aFirst, const Vector<Scalar, Length> aSecond) {
-	    for(uint32_t i = 0; i < Length; ++i) {
-            aFirst[i] *= aSecond[i];
-	    }
-	    return aFirst;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length>& operator/=(Vector<Scalar, Length>& aFirst, const Vector<Scalar, Length> aSecond) {
-	    for(uint32_t i = 0; i < Length; ++i) {
-            aFirst[i] /= aSecond[i];
-	    }
-	    return aFirst;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length> operator+(const Vector<Scalar, Length> aFirst, const Vector<Scalar, Length> aSecond) {
-	    Vector<Scalar, Length> tmp;
-	    for(uint32_t i = 0; i < Length; ++i) {
-            tmp[i] = aFirst[i] + aSecond[i];
-	    }
-	    return tmp;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length> operator-(const Vector<Scalar, Length> aFirst, const Vector<Scalar, Length> aSecond) {
-        Vector<Scalar, Length> tmp;
-	    for(uint32_t i = 0; i < Length; ++i) {
-            tmp[i] = aFirst[i] - aSecond[i];
-	    }
-	    return tmp;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length> operator*(const Vector<Scalar, Length> aFirst, const Vector<Scalar, Length> aSecond) {
-        Vector<Scalar, Length> tmp;
-	    for(uint32_t i = 0; i < Length; ++i) {
-            tmp[i] = aFirst[i] * aSecond[i];
-	    }
-	    return tmp;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length> operator/(const Vector<Scalar, Length> aFirst, const Vector<Scalar, Length> aSecond) {
-	    return Vector<Scalar, Length>(aFirst) /= aSecond;
-	}
-
-	// Vector / Scalar
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length>& operator+=(Vector<Scalar, Length>& aFirst, const Scalar aSecond) {
-	    for(uint32_t i = 0; i < Length; ++i) {
-            aFirst[i] += aSecond;
-	    }
-	    return aFirst;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length>& operator-=(Vector<Scalar, Length>& aFirst, const Scalar aSecond) {
-	    for(uint32_t i = 0; i < Length; ++i) {
-            aFirst[i] -= aSecond;
-	    }
-	    return aFirst;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length>& operator*=(Vector<Scalar, Length>& aFirst, const Scalar aSecond) {
-	    for(uint32_t i = 0; i < Length; ++i) {
-            aFirst[i] *= aSecond;
-	    }
-	    return aFirst;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length>& operator/=(Vector<Scalar, Length>& aFirst, const Scalar aSecond) {
-	    for(uint32_t i = 0; i < Length; ++i) {
-            aFirst[i] /= aSecond;
-	    }
-	    return aFirst;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length> operator+(const Vector<Scalar, Length> aFirst, const Scalar aSecond) {
-	    return Vector<Scalar, Length>(aFirst) += aSecond;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length> operator-(const Vector<Scalar, Length> aFirst, const Scalar aSecond) {
-	    return Vector<Scalar, Length>(aFirst) -= aSecond;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length> operator*(const Vector<Scalar, Length> aFirst, const Scalar aSecond) {
-	    return Vector<Scalar, Length>(aFirst) *= aSecond;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length> operator/(const Vector<Scalar, Length> aFirst, const Scalar aSecond) {
-	    return Vector<Scalar, Length>(aFirst) /= aSecond;
-	}
-
-	// Scalar / Vector
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length> operator+(const Scalar aFirst, const Vector<Scalar, Length> aSecond) {
-	    Vector<Scalar, Length> tmp;
-	    for(uint32_t i = 0; i < Length; ++i) {
-            tmp[i] = aFirst + aSecond[i];
-	    }
-	    return tmp;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length> operator-(const Scalar aFirst, const Vector<Scalar, Length> aSecond) {
-	    Vector<Scalar, Length> tmp;
-	    for(uint32_t i = 0; i < Length; ++i) {
-            tmp[i] = aFirst - aSecond[i];
-	    }
-	    return tmp;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length> operator*(const Scalar aFirst, const Vector<Scalar, Length> aSecond) {
-	    Vector<Scalar, Length> tmp;
-	    for(uint32_t i = 0; i < Length; ++i) {
-            tmp[i] = aFirst * aSecond[i];
-	    }
-	    return tmp;
-	}
-
-	template<class Scalar, const uint32_t Length>
-	Vector<Scalar, Length> operator/(const Scalar aFirst, const Vector<Scalar, Length> aSecond) {
-	    Vector<Scalar, Length> tmp;
-	    for(uint32_t i = 0; i < Length; ++i) {
-            tmp[i] = aFirst / aSecond[i];
-	    }
-	    return tmp;
-	}
-
-	// Typedef
+	// Typedefs
 
 	template<class Scalar>
 	using Vector2 = Vector<Scalar, 2>;
@@ -571,6 +420,8 @@ namespace Solaire{
 	typedef Vector4<float>      Vector4F;
 	typedef Vector4<double>     Vector4D;
 }
+
+#include "Vector.inl"
 
 
 #endif

@@ -31,7 +31,7 @@ Created			: 1st October 2015
 Last Modified	: 5th January 2016
 */
 
-#include "..\..\Core\ModuleHeader.hpp"
+#include "Solaire\Core\ModuleHeader.hpp"
 
 namespace Solaire{
 

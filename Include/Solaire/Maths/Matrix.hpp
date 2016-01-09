@@ -21,11 +21,10 @@
 
 /*!
 	\file Matrix.hpp
-	\brief
+	\brief Contains code for N dimentional Matrices, with typedefs for commonly used configurations.
 	\author
 	Created			: Adam Smith
 	Last modified	: Adam Smith
-	\version 1.0.0
 	\date
 	Created			: 23rd September 2015
 	Last Modified	: 9th January 2016
@@ -37,6 +36,14 @@ namespace Solaire {
 
     //! \todo Implement Translation / Rotation / Scale helpers
 
+    /*!
+        \brief
+        \detail
+        \tparam T The scalar type of the elements of this Matrix.
+        \tparam WIDTH The width of this Matrix.
+        \tparam HEIGHT The height of this Matrix.
+        \version 1.0.0
+    */
 	template<class T, const uint32_t WIDTH, const uint32_t HEIGHT>
 	class Matrix{
 	public:
@@ -52,6 +59,19 @@ namespace Solaire {
 	private:
 		Scalar mData[Width * Height];                   //!< Contains the elements of this Matrix in row major order.
 	public:
+
+	    /*!
+            \brief Create a new matrix.
+            \detail This will be equal to the identity Matrix.
+            \code
+            Matrix<float, 3, 3> matrix(); // This matrix is equivalent to the following :
+            Matrix<float, 3, 3> matrix({
+                1, 0, 0,
+                0, 1, 0,
+                0, 0, 1
+            });
+            \endcode
+	    */
 	    Matrix() throw() {
 	        enum : uint32_t{Size = Width * Height};
             for(uint32_t i = 0; i < Width; ++i) {
@@ -61,6 +81,19 @@ namespace Solaire {
 			}
 		}
 
+        /*!
+            \brief Create a Matrix with a scalar value in the diagonal.
+            \detail
+            \code
+            Matrix<float, 3, 3> matrix(5); // This matrix is equivalent to the following :
+            Matrix<float, 3, 3> matrix({
+                5, 0, 0,
+                0, 5, 0,
+                0, 0, 5
+            });
+            \endcode
+            \param aScalar The scalar value.
+        */
 	    Matrix(const Scalar aScalar) throw() {
 	        enum : uint32_t{Size = Width * Height};
             for(uint32_t i = 0; i < Width; ++i) {
@@ -70,16 +103,24 @@ namespace Solaire {
 			}
 		}
 
+        /*!
+            \brief Create a Matrix with a pre-defined set of elements.
+            \param aElements The elements to place into the Matrix.
+        */
         Matrix(const std::initializer_list<Scalar> aElements) throw() {
 	        enum : uint32_t{Size = Width * Height};
 	        auto j = aElements.begin();
 	        const uint32_t size = aElements.size();
 	        const uint32_t min = Size <= size ? Size : size;
+
+	        // Copy elements into the Matrix
 	        for(uint32_t i = 0; i < min; ++i){
                 mData[i] = *j;
                 ++j;
 	        }
 
+            // Replace any remaining elements with default values
+            //! \todo Identity values
             for(uint32_t i = min; i < Size; ++i){
                 mData[i] = static_cast<Scalar>(0);
 	        }
@@ -87,52 +128,123 @@ namespace Solaire {
 
 	    // C++ Operators
 
+
+        /*!
+            \brief Convert this Matrix to a representation in another scalar type.
+            \tparam Scalar2 The scalar type to convert to.
+            \return The converted Matrix.
+        */
 		template<class Scalar2>
 	    explicit operator Matrix<Scalar2, Width, Height>() const throw() {
 	        enum : uint32_t{Size = Width * Height};
 	        Matrix<Scalar2, Width, Height> tmp;
+
+	        // Convert each element
 	        const Scalar* const ptr = tmp.Ptr();
 	        for(uint32_t i = 0; i < Size; ++i){
                 ptr[i] = static_cast<Scalar2>(mData[i]);
 	        }
+
 	        return tmp;
 	    }
 
+        /*!
+            \brief Transpose conversion operator.
+            \tparam W Used for conditional compilation.
+            \tparam H Used for conditional compilation.
+            \tparam ENABLE Used for conditional compilation.
+            \return The transposed Matrix.
+            \see Transpose
+        */
         template<const uint32_t W = Width, const uint32_t H = Height, class ENABLE = typename std::enable_if<W != H>::type>
 	    explicit operator Matrix<Scalar, Height, Width>() const throw() {
 	       return Transpose();
 	    }
 
+        /*!
+            \brief Get a pointer to the first element in a Row of the Matrix.
+            \param aIndex The index of the Row.
+            \return The address of the Row.
+            \see Row
+            \see GetRow
+        */
 		const Scalar* operator[](const uint32_t aIndex) const throw() {
 			return mData + (aIndex * Width);
 		}
 
+        /*!
+            \brief Get a pointer to the first element in a Row of the Matrix.
+            \param aIndex The index of the Row.
+            \return The address of the Row.
+            \see Row
+            \see GetRow
+        */
 		Scalar* operator[](const uint32_t aIndex) throw() {
 			return mData + (aIndex * Width);
 		}
 
+        /*!
+            \brief Check if this Matrix is equal to another Matrix.
+            \param aOther The second Matrix.
+            \return True if the Matrices are the same.
+        */
 		bool operator==(const Matrix<Scalar, Width, Height>& aOther) const throw() {
 			return std::memcmp(mData, aOther.mData, sizeof(Scalar) * Width * Height) == 0;
 		}
 
+        /*!
+            \brief Check if this Matrix is not equal to another Matrix.
+            \param aOther The second Matrix.
+            \return True if the Matrices are different.
+        */
 		bool operator!=(const Matrix<Scalar, Width, Height>& aOther) const throw() {
 			return std::memcmp(mData, aOther.mData, sizeof(Scalar) * Width * Height) != 0;
 		}
 
 		// Misc
 
+        /*!
+            \brief Access the elements of this Matrix as a C-style array.
+            \return The address of index [0,0].
+        */
 		const Scalar* Ptr() const throw() {
 			return mData;
 		}
 
+        /*!
+            \brief Access the elements of this Matrix as a C-style array.
+            \return The address of index [0,0].
+        */
 		Scalar* Ptr() throw() {
 			return mData;
 		}
 
+        /*!
+            \brief Get a Row of the matrix.
+            \param The index of the Row to get.
+            \see Row
+            \see SetRow
+        */
+		Row& GetRow(const uint32_t aIndex) throw() {
+		    return *reinterpret_cast<Row*>(mData + (aIndex * Width));
+		}
+
+        /*!
+            \brief Get a Row of the matrix.
+            \param The index of the Row to get.
+            \see Row
+            \see SetRow
+        */
 		Row GetRow(const uint32_t aIndex) const throw() {
 		    return *reinterpret_cast<const Row*>(mData + (aIndex * Width));
 		}
 
+        /*!
+            \brief Get a Column of the matrix.
+            \param The index of the Column to get.
+            \see Column
+            \see SetColumn
+        */
 		Column GetColumn(const uint32_t aIndex) const throw() {
 		    Column tmp;
 			for(uint32_t i = 0; i < Height; ++i) {
@@ -141,6 +253,13 @@ namespace Solaire {
 			return tmp;
 		}
 
+        /*!
+            \brief Set a Row of this Matrix.
+            \brief aIndex The index of the Row to set.
+            \brief aRow The value to set the Row to.
+            \see Row
+            \see GetRow
+        */
 		void SetRow(const uint32_t aIndex, const Row aRow) throw() {
 			std::memcpy(mData + Width * aIndex, aRow.Ptr(), sizeof(Scalar) * Width);
 		}
@@ -149,6 +268,8 @@ namespace Solaire {
             \brief Set a Column of this Matrix.
             \brief aIndex The index of the Column to set.
             \brief aColumn The value to set the column to.
+            \see Column
+            \see GetColumn
         */
 		void SetColumn(const uint32_t aIndex, const Column aColumn) throw() {
 			for(uint32_t i = 0; i < Height; ++i) {

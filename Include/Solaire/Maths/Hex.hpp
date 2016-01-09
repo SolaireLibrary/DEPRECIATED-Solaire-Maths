@@ -134,8 +134,8 @@ namespace Solaire {
 
         // Convert all paired characters
         while((end - hex) >= 2){
-            *bin = HexToByte(*hex, *(++hex));
-            ++hex;
+            *bin = HexToByte(hex[0], hex[1]);
+            hex += 2;
             --bin;
         }
 

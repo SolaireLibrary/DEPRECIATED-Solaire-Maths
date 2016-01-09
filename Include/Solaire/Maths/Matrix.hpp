@@ -25,10 +25,10 @@
 	\author
 	Created			: Adam Smith
 	Last modified	: Adam Smith
-	\version 1.0
+	\version 1.0.0
 	\date
 	Created			: 23rd September 2015
-	Last Modified	: 5th January 2016
+	Last Modified	: 9th January 2016
 */
 
 #include "Vector.hpp"
@@ -40,17 +40,17 @@ namespace Solaire {
 	template<class T, const uint32_t WIDTH, const uint32_t HEIGHT>
 	class Matrix{
 	public:
-		typedef T Scalar;
+		typedef T Scalar;                               //!< The scalar element type.
 		enum : uint32_t {
-		    Width = WIDTH,
-		    Height = HEIGHT,
-		    Min = Width < Height ? Width : Height,
-		    Max = Width > Height ? Width : Height
+		    Width = WIDTH,                              //!< The width of this Matrix.
+		    Height = HEIGHT,                            //!< The height of this Matrix.
+		    Min = Width < Height ? Width : Height,      //!< The smaller of Width or Height.
+		    Max = Width > Height ? Width : Height       //!< The larger of Width or Height.
 		};
-		typedef Vector<Scalar, Width> Row;
-		typedef Vector<Scalar, Height> Column;
+		typedef Vector<Scalar, Width> Row;              //!< A Vector that can represent a row of this Matrix.
+		typedef Vector<Scalar, Height> Column;          //!< A Vector that can represent a column of this Matrix.
 	private:
-		Scalar mData[Width * Height];
+		Scalar mData[Width * Height];                   //!< Contains the elements of this Matrix in row major order.
 	public:
 	    Matrix() throw() {
 	        enum : uint32_t{Size = Width * Height};
@@ -165,132 +165,6 @@ namespace Solaire {
 		}
 	};
 
-    // Matrix / Matrix
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height>
-    Matrix<Scalar, Width, Height>& operator+=(Matrix<Scalar, Width, Height>& aFirst, const Matrix<Scalar, Width, Height>& aSecond) {
-        typedef Matrix<Scalar, Width, Height> MatrixType;
-        typedef Vector<Scalar, Width * Height> VectorType;
-        return reinterpret_cast<MatrixType&>(reinterpret_cast<VectorType&>(aFirst) += reinterpret_cast<const VectorType&>(aSecond));
-    }
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height>
-    Matrix<Scalar, Width, Height>& operator-=(Matrix<Scalar, Width, Height>& aFirst, const Matrix<Scalar, Width, Height>& aSecond) {
-        typedef Matrix<Scalar, Width, Height> MatrixType;
-        typedef Vector<Scalar, Width * Height> VectorType;
-        return reinterpret_cast<MatrixType&>(reinterpret_cast<VectorType&>(aFirst) -= reinterpret_cast<const VectorType&>(aSecond));
-    }
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height, class ENABLe = typename std::enable_if<Width == Height>::type>
-    Matrix<Scalar, Width, Height>& operator*=(Matrix<Scalar, Width, Height>& aFirst, const Matrix<Scalar, Width, Height>& aSecond) {
-        return aFirst = aFirst * aSecond;;
-    }
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height>
-    Matrix<Scalar, Width, Height> operator+(const Matrix<Scalar, Width, Height>& aFirst, const Matrix<Scalar, Width, Height>& aSecond) {
-        return Matrix<Scalar, Width, Height>(aFirst) += aSecond;
-    }
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height>
-    Matrix<Scalar, Width, Height> operator-(const Matrix<Scalar, Width, Height>& aFirst, const Matrix<Scalar, Width, Height>& aSecond) {
-        return Matrix<Scalar, Width, Height>(aFirst) -= aSecond;
-    }
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height, const uint32_t MinSize = Width < Height ? Width : Height>
-    Matrix<Scalar, MinSize, MinSize> operator*(const Matrix<Scalar, Width, Height>& aFirst, const Matrix<Scalar, Height, Width>& aSecond) {
-        Matrix<Scalar, MinSize, MinSize> tmp;
-
-        for(uint32_t i = 0; i < MinSize; ++i){
-            const Vector<Scalar, Width>& srcRow = *reinterpret_cast<const Vector<Scalar, Width>*>(aFirst.Ptr() + Width * i);
-            Scalar* const dstRow = tmp.Ptr() + Width * i;
-            for(uint32_t j = 0; j < MinSize; ++j){
-                dstRow[j] = srcRow.DotProduct(aSecond.GetColumn(j));
-            }
-        }
-
-        return tmp;
-    }
-
-    // Matrix / Scalar
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height>
-    Matrix<Scalar, Width, Height>& operator+=(Matrix<Scalar, Width, Height>& aFirst, const Scalar aSecond) {
-        typedef Matrix<Scalar, Width, Height> MatrixType;
-        typedef Vector<Scalar, Width * Height> VectorType;
-        return reinterpret_cast<MatrixType&>(reinterpret_cast<VectorType&>(aFirst) += aSecond);
-    }
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height>
-    Matrix<Scalar, Width, Height>& operator-=(Matrix<Scalar, Width, Height>& aFirst, const Scalar aSecond) {
-        typedef Matrix<Scalar, Width, Height> MatrixType;
-        typedef Vector<Scalar, Width * Height> VectorType;
-        return reinterpret_cast<MatrixType&>(reinterpret_cast<VectorType&>(aFirst) -= aSecond);
-    }
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height>
-    Matrix<Scalar, Width, Height>& operator*=(Matrix<Scalar, Width, Height>& aFirst, const Scalar aSecond) {
-        typedef Matrix<Scalar, Width, Height> MatrixType;
-        typedef Vector<Scalar, Width * Height> VectorType;
-        return reinterpret_cast<MatrixType&>(reinterpret_cast<VectorType&>(aFirst) *= aSecond);
-    }
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height>
-    Matrix<Scalar, Width, Height>& operator/=(Matrix<Scalar, Width, Height>& aFirst, const Scalar aSecond) {
-        typedef Matrix<Scalar, Width, Height> MatrixType;
-        typedef Vector<Scalar, Width * Height> VectorType;
-        return reinterpret_cast<MatrixType&>(reinterpret_cast<VectorType&>(aFirst) /= aSecond);
-    }
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height>
-    Matrix<Scalar, Width, Height> operator+(const Matrix<Scalar, Width, Height>& aFirst, const Scalar aSecond) {
-        return Matrix<Scalar, Width, Height>(aFirst) += aSecond;
-    }
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height>
-    Matrix<Scalar, Width, Height> operator-(const Matrix<Scalar, Width, Height>& aFirst, const Scalar aSecond) {
-        return Matrix<Scalar, Width, Height>(aFirst) -= aSecond;
-    }
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height>
-    Matrix<Scalar, Width, Height> operator*(const Matrix<Scalar, Width, Height>& aFirst, const Scalar aSecond) {
-        return Matrix<Scalar, Width, Height>(aFirst) *= aSecond;
-    }
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height>
-    Matrix<Scalar, Width, Height> operator/(const Matrix<Scalar, Width, Height>& aFirst, const Scalar aSecond) {
-        return Matrix<Scalar, Width, Height>(aFirst) /= aSecond;
-    }
-
-    // Scalar / Matrix
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height>
-    Matrix<Scalar, Width, Height> operator+(const Scalar aFirst, const Matrix<Scalar, Width, Height>& aSecond) {
-        typedef Matrix<Scalar, Width, Height> MatrixType;
-        typedef Vector<Scalar, Width * Height> VectorType;
-        return reinterpret_cast<MatrixType&>(aFirst + reinterpret_cast<const VectorType&>(aSecond));
-    }
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height>
-    Matrix<Scalar, Width, Height> operator-(const Scalar aFirst, const Matrix<Scalar, Width, Height>& aSecond) {
-        typedef Matrix<Scalar, Width, Height> MatrixType;
-        typedef Vector<Scalar, Width * Height> VectorType;
-        return reinterpret_cast<MatrixType&>(aFirst - reinterpret_cast<const VectorType&>(aSecond));
-    }
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height>
-    Matrix<Scalar, Width, Height> operator*(const Scalar aFirst, const Matrix<Scalar, Width, Height>& aSecond) {
-        typedef Matrix<Scalar, Width, Height> MatrixType;
-        typedef Vector<Scalar, Width * Height> VectorType;
-        return reinterpret_cast<MatrixType&>(aFirst * reinterpret_cast<const VectorType&>(aSecond));
-    }
-
-    template<class Scalar, const uint32_t Width, const uint32_t Height>
-    Matrix<Scalar, Width, Height> operator/(const Scalar aFirst, const Matrix<Scalar, Width, Height>& aSecond) {
-        typedef Matrix<Scalar, Width, Height> MatrixType;
-        typedef Vector<Scalar, Width * Height> VectorType;
-        return reinterpret_cast<MatrixType&>(aFirst / reinterpret_cast<const VectorType&>(aSecond));
-    }
-
     // Matrix / Vector
     //! \todo Implement matrix / vector maths
 
@@ -300,46 +174,48 @@ namespace Solaire {
     // Typedefs
 
 	template<class T>
-	using Matrix2 = Matrix<T, 2, 2>;
+	using Matrix2 = Matrix<T, 2, 2>;            //!< A 2x2 Matrix.
 
 	template<class T>
-	using Matrix3 = Matrix<T, 3, 3>;
+	using Matrix3 = Matrix<T, 3, 3>;            //!< A 3x3 Matrix.
 
 	template<class T>
-	using Matrix4 = Matrix<T, 4, 4>;
+	using Matrix4 = Matrix<T, 4, 4>;            //!< A 4x4 Matrix.
 
-	typedef Matrix2<uint8_t>	Matrix2U8;
-	typedef Matrix2<int8_t>		Matrix2I8;
-	typedef Matrix2<uint16_t>	Matrix2U16;
-	typedef Matrix2<int16_t>	Matrix2I16;
-	typedef Matrix2<uint32_t>	Matrix2U32;
-	typedef Matrix2<int32_t>	Matrix2I32;
-	typedef Matrix2<uint64_t>	Matrix2U64;
-	typedef Matrix2<int64_t>	Matrix2I64;
-	typedef Matrix2<float>		Matrix2F;
-	typedef Matrix2<double>		Matrix2D;
+	typedef Matrix2<uint8_t>	Matrix2U8;      //!< A 2x2 Matrix using unsigned 8 bit scalars.
+	typedef Matrix2<int8_t>		Matrix2I8;      //!< A 2x2 Matrix using signed 8 bit scalars.
+	typedef Matrix2<uint16_t>	Matrix2U16;     //!< A 2x2 Matrix using unsigned 16 bit scalars.
+	typedef Matrix2<int16_t>	Matrix2I16;     //!< A 2x2 Matrix using signed 16 bit scalars.
+	typedef Matrix2<uint32_t>	Matrix2U32;     //!< A 2x2 Matrix using unsigned 32 bit scalars.
+	typedef Matrix2<int32_t>	Matrix2I32;     //!< A 2x2 Matrix using signed 32 bit scalars.
+	typedef Matrix2<uint64_t>	Matrix2U64;     //!< A 2x2 Matrix using unsigned 64 bit scalars.
+	typedef Matrix2<int64_t>	Matrix2I64;     //!< A 2x2 Matrix using signed 64 bit scalars.
+	typedef Matrix2<float>		Matrix2F;       //!< A 2x2 Matrix using single precision scalars.
+	typedef Matrix2<double>		Matrix2D;       //!< A 2x2 Matrix using double precision scalars.
 
-	typedef Matrix3<uint8_t>	Matrix3U8;
-	typedef Matrix3<int8_t>		Matrix3I8;
-	typedef Matrix3<uint16_t>	Matrix3U16;
-	typedef Matrix3<int16_t>	Matrix3I16;
-	typedef Matrix3<uint32_t>	Matrix3U32;
-	typedef Matrix3<int32_t>	Matrix3I32;
-	typedef Matrix3<uint64_t>	Matrix3U64;
-	typedef Matrix3<int64_t>	Matrix3I64;
-	typedef Matrix3<float>		Matrix3F;
-	typedef Matrix3<double>		Matrix3D;
+	typedef Matrix3<uint8_t>	Matrix3U8;      //!< A 3x3 Matrix using unsigned 8 bit scalars.
+	typedef Matrix3<int8_t>		Matrix3I8;      //!< A 3x3 Matrix using signed 8 bit scalars.
+	typedef Matrix3<uint16_t>	Matrix3U16;     //!< A 3x3 Matrix using unsigned 16 bit scalars.
+	typedef Matrix3<int16_t>	Matrix3I16;     //!< A 3x3 Matrix using signed 16 bit scalars.
+	typedef Matrix3<uint32_t>	Matrix3U32;     //!< A 3x3 Matrix using unsigned 32 bit scalars.
+	typedef Matrix3<int32_t>	Matrix3I32;     //!< A 3x3 Matrix using signed 32 bit scalars.
+	typedef Matrix3<uint64_t>	Matrix3U64;     //!< A 3x3 Matrix using unsigned 64 bit scalars.
+	typedef Matrix3<int64_t>	Matrix3I64;     //!< A 3x3 Matrix using signed 64 bit scalars.
+	typedef Matrix3<float>		Matrix3F;       //!< A 3x3 Matrix using single precision scalars.
+	typedef Matrix3<double>		Matrix3D;       //!< A 3x3 Matrix using double precision scalars.
 
-	typedef Matrix4<uint8_t>	Matrix4U8;
-	typedef Matrix4<int8_t>		Matrix4I8;
-	typedef Matrix4<uint16_t>	Matrix4U16;
-	typedef Matrix4<int16_t>	Matrix4I16;
-	typedef Matrix4<uint32_t>	Matrix4U32;
-	typedef Matrix4<int32_t>	Matrix4I32;
-	typedef Matrix4<uint64_t>	Matrix4U64;
-	typedef Matrix4<int64_t>	Matrix4I64;
-	typedef Matrix4<float>		Matrix4F;
-	typedef Matrix4<double>		Matrix4D;
+	typedef Matrix4<uint8_t>	Matrix4U8;      //!< A 4x4 Matrix using unsigned 8 bit scalars.
+	typedef Matrix4<int8_t>		Matrix4I8;      //!< A 4x4 Matrix using signed 8 bit scalars.
+	typedef Matrix4<uint16_t>	Matrix4U16;     //!< A 4x4 Matrix using unsigned 16 bit scalars.
+	typedef Matrix4<int16_t>	Matrix4I16;     //!< A 4x4 Matrix using signed 16 bit scalars.
+	typedef Matrix4<uint32_t>	Matrix4U32;     //!< A 4x4 Matrix using unsigned 32 bit scalars.
+	typedef Matrix4<int32_t>	Matrix4I32;     //!< A 4x4 Matrix using signed 32 bit scalars.
+	typedef Matrix4<uint64_t>	Matrix4U64;     //!< A 4x4 Matrix using unsigned 64 bit scalars.
+	typedef Matrix4<int64_t>	Matrix4I64;     //!< A 4x4 Matrix using signed 64 bit scalars.
+	typedef Matrix4<float>		Matrix4F;       //!< A 4x4 Matrix using single precision scalars.
+	typedef Matrix4<double>		Matrix4D;       //!< A 4x4 Matrix using double precision scalars.
 }
+
+#include "Matrix.inl"
 
 #endif

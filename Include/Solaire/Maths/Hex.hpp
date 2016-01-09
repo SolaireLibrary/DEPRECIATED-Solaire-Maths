@@ -38,9 +38,9 @@ namespace Solaire {
     typedef char HexChar;
 
     namespace HexImplementation {
-        static constexpr HexChar HEX_LOOKUP[17] = "0123456789ABCDEF";   //!< Defines the hex character representations (0-F) of the values 0-15.
+        static constexpr HexChar BIN2HEX_LOOKUP[17] = "0123456789ABCDEF";   //!< Lookup table for conversion of binary (nybble) to hexadecimal.
 
-        static constexpr uint8_t BINARY_LOOKUP[256] = {
+        static constexpr uint8_t HEX2BIN_LOOKUP[256] = {
             0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
             0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
             0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
@@ -67,7 +67,7 @@ namespace Solaire {
             0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
             0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
             0,	0,	0,	0,	0,	0
-        };
+        } //!< Lookup table for conversion of hexadecimal to binary.
     }
 
     /*!
@@ -76,7 +76,7 @@ namespace Solaire {
         \return The binary value of the character.
     */
     static constexpr uint8_t HexToNybble(const HexChar aHex) {
-        return HexImplementation::BINARY_LOOKUP[aHex];
+        return HexImplementation::HEX2BIN_LOOKUP[aHex];
     }
 
     /*!
@@ -95,7 +95,7 @@ namespace Solaire {
         \return The hexadecimal representation of the binary data.
     */
     static constexpr HexChar NybbleToHex(const uint8_t aNybble) {
-        return HexImplementation::HEX_LOOKUP[aNybble];
+        return HexImplementation::BIN2HEX_LOOKUP[aNybble];
     }
 
     /*!

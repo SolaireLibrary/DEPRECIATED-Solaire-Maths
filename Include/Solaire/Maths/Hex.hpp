@@ -95,8 +95,8 @@ namespace Solaire {
     */
     static constexpr uint16_t HexToBin16(const HexChar* const aHex) {
         return
-            static_cast<uint16_t>(HexToBin8(aHex) << 4) |
-            static_cast<uint16_t>(HexToBin8(aHex + 4));
+            (static_cast<uint16_t>(HexToBin8(aHex)) << 8) |
+            static_cast<uint16_t>(HexToBin8(aHex + 2));
     }
 
     /*!
@@ -242,7 +242,28 @@ namespace Solaire {
         uint8_t* bin = static_cast<uint8_t*>(aBinary) + (aBinaryLength - 1);
 
         // Convert all paired characters
-        while((end - hex) >= 2){
+        while((end - hex) >= 16) {
+            bin -= 7;
+            *reinterpret_cast<uint64_t*>(bin) = HexToBin64(hex);
+            hex += 16;
+            --bin;
+        }
+
+        if((end - hex) >= 8) {
+            bin -= 3;
+            *reinterpret_cast<uint32_t*>(bin) = HexToBin32(hex);
+            hex += 8;
+            --bin;
+        }
+
+        if((end - hex) >= 4) {
+            --bin;
+            *reinterpret_cast<uint16_t*>(bin) = HexToBin16(hex);
+            hex += 4;
+            --bin;
+        }
+
+        if((end - hex) >= 2) {
             *bin = HexToBin8(hex);
             hex += 2;
             --bin;

@@ -38,7 +38,36 @@ namespace Solaire {
     typedef char HexChar;
 
     namespace HexImplementation {
-        static constexpr HexChar HEX_CHARS[17] = "0123456789ABCDEF";   //!< Defines the hex character representations (0-F) of the values 0-15.
+        static constexpr HexChar HEX_LOOKUP[17] = "0123456789ABCDEF";   //!< Defines the hex character representations (0-F) of the values 0-15.
+
+        static constexpr uint8_t BINARY_LOOKUP[256] = {
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	1,
+            2,	3,	4,	5,	6,	7,	8,	9,	0,	0,
+            0,	0,	0,	0,	0,	10,	11,	12,	13,	14,
+            15,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	10,	11,	12,
+            13,	14,	15,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
+            0,	0,	0,	0,	0,	0
+        };
     }
 
     /*!
@@ -47,11 +76,7 @@ namespace Solaire {
         \return The binary value of the character.
     */
     static constexpr uint8_t HexToNybble(const HexChar aHex) {
-        return
-            aHex >= '0' && aHex <= '9' ? static_cast<uint8_t>(aHex - '0') :
-            aHex >= 'A' && aHex <= 'F' ? 10 + static_cast<uint8_t>(aHex - 'A') :
-            aHex >= 'a' && aHex <= 'f' ? 10 + static_cast<uint8_t>(aHex - 'a') :
-            0;
+        return HexImplementation::BINARY_LOOKUP[aHex];
     }
 
     /*!
@@ -70,7 +95,7 @@ namespace Solaire {
         \return The hexadecimal representation of the binary data.
     */
     static constexpr HexChar NybbleToHex(const uint8_t aNybble) {
-        return HexImplementation::HEX_CHARS[aNybble];
+        return HexImplementation::HEX_LOOKUP[aNybble];
     }
 
     /*!

@@ -221,9 +221,36 @@ namespace Solaire {
     static bool BinaryToHex(const void* const aBinary, const uint32_t aBinaryLength, HexChar* const aHex, const uint32_t aHexLength) {
         if(aHexLength < BinaryToHexLength(aBinaryLength)) return false;
         const uint8_t* const bin = static_cast<const uint8_t*>(aBinary);
-        for(uint32_t i = 0; i < aBinaryLength; ++i) {
-            Bin8ToHex(bin[aBinaryLength - (i + 1)], aHex + i * 2);
+        HexChar* hex = aHex;
+        int32_t bytes = aBinaryLength - 1;
+
+        while(bytes >= 7) {
+            bytes -= 7;
+            Bin64ToHex(*reinterpret_cast<const uint64_t*>(bin + bytes), hex);
+            --bytes;
+            hex += 16;
         }
+
+        if(bytes >= 3) {
+            bytes -= 3;
+            Bin32ToHex(*reinterpret_cast<const uint32_t*>(bin + bytes), hex);
+            --bytes;
+            hex += 8;
+        }
+
+        if(bytes >= 1) {
+            --bytes;
+            Bin16ToHex(*reinterpret_cast<const uint16_t*>(bin + bytes), hex);
+            --bytes;
+            hex += 4;
+        }
+
+        if(bytes >= 0) {
+            Bin8ToHex(bin[bytes], hex);
+            --bytes;
+            hex += 2;
+        }
+
         return true;
     }
 

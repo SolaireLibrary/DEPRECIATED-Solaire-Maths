@@ -135,19 +135,24 @@ namespace Solaire {
 
 		Column GetColumn(const uint32_t aIndex) const throw() {
 		    Column tmp;
-			for(uint32_t i = 0; i < HEIGHT; ++i) {
-				tmp[i] = mData[i * aIndex];
+			for(uint32_t i = 0; i < Height; ++i) {
+				tmp[i] = mData[i * Width + aIndex];
 			}
 			return tmp;
 		}
 
 		void SetRow(const uint32_t aIndex, const Row aRow) throw() {
-			std::memcpy(mData, aRow.Ptr(), sizeof(Scalar) * Width);
+			std::memcpy(mData + Width * aIndex, aRow.Ptr(), sizeof(Scalar) * Width);
 		}
 
+        /*!
+            \brief Set a Column of this Matrix.
+            \brief aIndex The index of the Column to set.
+            \brief aColumn The value to set the column to.
+        */
 		void SetColumn(const uint32_t aIndex, const Column aColumn) throw() {
 			for(uint32_t i = 0; i < Height; ++i) {
-				mData[i * aIndex] = aColumn[i];
+				mData[i * Width + aIndex] = aColumn[i];
 			}
 		}
 
@@ -156,6 +161,9 @@ namespace Solaire {
 			return Matrix<Scalar, Height, Width>();
 		}
 
+        /*!
+            \brief Rotate this Matrix by 90 degrees.
+        */
 		Matrix<Scalar, Height, Width> Transpose() const throw() {
 			Matrix<Scalar, Height, Width> tmp;
 			for(uint32_t i = 0; i < Width; ++i) {

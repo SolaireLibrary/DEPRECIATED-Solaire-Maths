@@ -67,7 +67,7 @@ namespace Solaire {
             0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
             0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
             0,	0,	0,	0,	0,	0
-        } //!< Lookup table for conversion of hexadecimal to binary.
+        }; //!< Lookup table for conversion of hexadecimal to binary.
     }
 
     /*!
@@ -75,18 +75,50 @@ namespace Solaire {
         \param aHex The hex character to convert.
         \return The binary value of the character.
     */
-    static constexpr uint8_t HexToNybble(const HexChar aHex) {
+    static constexpr uint8_t HexToBin4(const HexChar aHex) {
         return HexImplementation::HEX2BIN_LOOKUP[aHex];
     }
 
     /*!
         \brief Convert two hexadecimal characters into 8 bits of binary data.
-        \param aHex0 The first character.
-        \param aHex1 The second character.
+        \param aHex The characters to convert.
         \return The binary data.
     */
-    static constexpr uint8_t HexToByte(const HexChar aHex0, const HexChar aHex1) {
-        return (HexToNybble(aHex0) << 4 )| HexToNybble(aHex1);
+    static constexpr uint8_t HexToBin8(const HexChar* const aHex) {
+        return (HexToBin4(aHex[0]) << 4 )| HexToBin4(aHex[1]);
+    }
+
+    /*!
+        \brief Convert four hexadecimal characters into 16 bits of binary data.
+        \param aHex The characters to convert.
+        \return The binary data.
+    */
+    static constexpr uint16_t HexToBin16(const HexChar* const aHex) {
+        return
+            static_cast<uint16_t>(HexToBin8(aHex) << 4) |
+            static_cast<uint16_t>(HexToBin8(aHex + 4));
+    }
+
+    /*!
+        \brief Convert 8 hexadecimal characters into 32 bits of binary data.
+        \param aHex The characters to convert.
+        \return The binary data.
+    */
+    static constexpr uint32_t HexToBin32(const HexChar* const aHex) {
+        return
+            static_cast<uint32_t>(HexToBin16(aHex) << 16) |
+            static_cast<uint32_t>(HexToBin16(aHex + 4));
+    }
+
+    /*!
+        \brief Convert 16 hexadecimal characters into 64 bits of binary data.
+        \param aHex The characters to convert.
+        \return The binary data.
+    */
+    static constexpr uint64_t HexToBin64(const HexChar* const aHex) {
+        return
+            static_cast<uint64_t>(HexToBin32(aHex) << 32L) |
+            static_cast<uint64_t>(HexToBin32(aHex + 8));
     }
 
     /*!
@@ -94,7 +126,7 @@ namespace Solaire {
         \param aNybble The binary data.
         \return The hexadecimal representation of the binary data.
     */
-    static constexpr HexChar NybbleToHex(const uint8_t aNybble) {
+    static constexpr HexChar Bin4ToHex(const uint8_t aNybble) {
         return HexImplementation::BIN2HEX_LOOKUP[aNybble];
     }
 
@@ -103,9 +135,61 @@ namespace Solaire {
         \param aByte The binary data.
         \param aChars The address to write the hex characters into.
     */
-    static void ByteToHex(const uint8_t aByte, HexChar* const aChars) {
-        aChars[0] = NybbleToHex(aByte >> 4);
-        aChars[1] = NybbleToHex(aByte & NYBBLE_0);
+    static void Bin8ToHex(const uint8_t aByte, HexChar* const aChars) {
+        aChars[0] = Bin4ToHex(aByte >> 4);
+        aChars[1] = Bin4ToHex(aByte & NYBBLE_0);
+    }
+
+    /*!
+        \brief Convert 16 bits of binary data into four hexadecimal characters.
+        \param aByte The binary data.
+        \param aChars The address to write the hex characters into.
+    */
+    static void Bin16ToHex(const uint16_t aByte, HexChar* const aChars) {
+        aChars[0] = Bin4ToHex((aByte >> 12) & NYBBLE_0);
+        aChars[1] = Bin4ToHex((aByte >> 8) & NYBBLE_0);
+        aChars[2] = Bin4ToHex((aByte >> 4) & NYBBLE_0);
+        aChars[3] = Bin4ToHex(aByte & NYBBLE_0);
+    }
+
+    /*!
+        \brief Convert 32 bits of binary data into eight hexadecimal characters.
+        \param aByte The binary data.
+        \param aChars The address to write the hex characters into.
+    */
+    static void Bin32ToHex(const uint32_t aByte, HexChar* const aChars) {
+        aChars[0] = Bin4ToHex((aByte >> 28) & NYBBLE_0);
+        aChars[1] = Bin4ToHex((aByte >> 24) & NYBBLE_0);
+        aChars[2] = Bin4ToHex((aByte >> 20) & NYBBLE_0);
+        aChars[3] = Bin4ToHex((aByte >> 16) & NYBBLE_0);
+        aChars[4] = Bin4ToHex((aByte >> 12) & NYBBLE_0);
+        aChars[5] = Bin4ToHex((aByte >> 8) & NYBBLE_0);
+        aChars[6] = Bin4ToHex((aByte >> 4) & NYBBLE_0);
+        aChars[7] = Bin4ToHex(aByte & NYBBLE_0);
+    }
+
+    /*!
+        \brief Convert 64 bits of binary data into sixteen hexadecimal characters.
+        \param aByte The binary data.
+        \param aChars The address to write the hex characters into.
+    */
+    static void Bin64ToHex(const uint32_t aByte, HexChar* const aChars) {
+        aChars[0] = Bin4ToHex((aByte >> 60L) & NYBBLE_0);
+        aChars[1] = Bin4ToHex((aByte >> 56L) & NYBBLE_0);
+        aChars[2] = Bin4ToHex((aByte >> 52L) & NYBBLE_0);
+        aChars[3] = Bin4ToHex((aByte >> 48L) & NYBBLE_0);
+        aChars[4] = Bin4ToHex((aByte >> 44L) & NYBBLE_0);
+        aChars[5] = Bin4ToHex((aByte >> 40L) & NYBBLE_0);
+        aChars[6] = Bin4ToHex((aByte >> 36L) & NYBBLE_0);
+        aChars[7] = Bin4ToHex((aByte >> 32L) & NYBBLE_0);
+        aChars[8] = Bin4ToHex((aByte >> 28L) & NYBBLE_0);
+        aChars[9] = Bin4ToHex((aByte >> 24L) & NYBBLE_0);
+        aChars[10] = Bin4ToHex((aByte >> 20L) & NYBBLE_0);
+        aChars[11] = Bin4ToHex((aByte >> 16L) & NYBBLE_0);
+        aChars[12] = Bin4ToHex((aByte >> 12L) & NYBBLE_0);
+        aChars[13] = Bin4ToHex((aByte >> 8L) & NYBBLE_0);
+        aChars[14] = Bin4ToHex((aByte >> 4L) & NYBBLE_0);
+        aChars[15] = Bin4ToHex(aByte & NYBBLE_0);
     }
 
     /*!
@@ -138,7 +222,7 @@ namespace Solaire {
         if(aHexLength < BinaryToHexLength(aBinaryLength)) return false;
         const uint8_t* const bin = static_cast<const uint8_t*>(aBinary);
         for(uint32_t i = 0; i < aBinaryLength; ++i) {
-            ByteToHex(bin[aBinaryLength - (i + 1)], aHex + i * 2);
+            Bin8ToHex(bin[aBinaryLength - (i + 1)], aHex + i * 2);
         }
         return true;
     }
@@ -159,14 +243,14 @@ namespace Solaire {
 
         // Convert all paired characters
         while((end - hex) >= 2){
-            *bin = HexToByte(hex[0], hex[1]);
+            *bin = HexToBin8(hex);
             hex += 2;
             --bin;
         }
 
         // Convert trailing character, if present
         if((end - hex) == 1) {
-            *bin = HexToNybble(*hex) << 4;
+            *bin = HexToBin4(*hex) << 4;
         }
         return true;
     }

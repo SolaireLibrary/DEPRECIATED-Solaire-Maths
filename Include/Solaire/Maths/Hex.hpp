@@ -75,7 +75,7 @@ namespace Solaire {
         \param aHex The hex character to convert.
         \return The binary value of the character.
     */
-    static constexpr uint8_t HexToBin4(const HexChar aHex) {
+    static constexpr uint8_t hexToBin4(const HexChar aHex) {
         return HexImplementation::HEX2BIN_LOOKUP[aHex];
     }
 
@@ -84,8 +84,8 @@ namespace Solaire {
         \param aHex The characters to convert.
         \return The binary data.
     */
-    static constexpr uint8_t HexToBin8(const HexChar* const aHex) {
-        return (HexToBin4(aHex[0]) << 4 )| HexToBin4(aHex[1]);
+    static constexpr uint8_t hexToBin8(const HexChar* const aHex) {
+        return (hexToBin4(aHex[0]) << 4 )| hexToBin4(aHex[1]);
     }
 
     /*!
@@ -93,10 +93,10 @@ namespace Solaire {
         \param aHex The characters to convert.
         \return The binary data.
     */
-    static constexpr uint16_t HexToBin16(const HexChar* const aHex) {
+    static constexpr uint16_t hexToBin16(const HexChar* const aHex) {
         return
-            (static_cast<uint16_t>(HexToBin8(aHex)) << 8) |
-            static_cast<uint16_t>(HexToBin8(aHex + 2));
+            (static_cast<uint16_t>(hexToBin8(aHex)) << 8) |
+            static_cast<uint16_t>(hexToBin8(aHex + 2));
     }
 
     /*!
@@ -104,10 +104,10 @@ namespace Solaire {
         \param aHex The characters to convert.
         \return The binary data.
     */
-    static constexpr uint32_t HexToBin32(const HexChar* const aHex) {
+    static constexpr uint32_t hexToBin32(const HexChar* const aHex) {
         return
-            static_cast<uint32_t>(HexToBin16(aHex) << 16) |
-            static_cast<uint32_t>(HexToBin16(aHex + 4));
+            static_cast<uint32_t>(hexToBin16(aHex) << 16) |
+            static_cast<uint32_t>(hexToBin16(aHex + 4));
     }
 
     /*!
@@ -115,10 +115,10 @@ namespace Solaire {
         \param aHex The characters to convert.
         \return The binary data.
     */
-    static constexpr uint64_t HexToBin64(const HexChar* const aHex) {
+    static constexpr uint64_t hexToBin64(const HexChar* const aHex) {
         return
-            static_cast<uint64_t>(HexToBin32(aHex) << 32L) |
-            static_cast<uint64_t>(HexToBin32(aHex + 8));
+            static_cast<uint64_t>(hexToBin32(aHex) << 32L) |
+            static_cast<uint64_t>(hexToBin32(aHex + 8));
     }
 
     /*!
@@ -126,7 +126,7 @@ namespace Solaire {
         \param aNybble The binary data.
         \return The hexadecimal representation of the binary data.
     */
-    static constexpr HexChar Bin4ToHex(const uint8_t aNybble) {
+    static constexpr HexChar bin4ToHex(const uint8_t aNybble) {
         return HexImplementation::BIN2HEX_LOOKUP[aNybble];
     }
 
@@ -135,9 +135,9 @@ namespace Solaire {
         \param aByte The binary data.
         \param aChars The address to write the hex characters into.
     */
-    static void Bin8ToHex(const uint8_t aByte, HexChar* const aChars) {
-        aChars[0] = Bin4ToHex(aByte >> 4);
-        aChars[1] = Bin4ToHex(aByte & NYBBLE_0);
+    static void bin8ToHex(const uint8_t aByte, HexChar* const aChars) {
+        aChars[0] = bin4ToHex(aByte >> 4);
+        aChars[1] = bin4ToHex(aByte & NYBBLE_0);
     }
 
     /*!
@@ -145,11 +145,11 @@ namespace Solaire {
         \param aByte The binary data.
         \param aChars The address to write the hex characters into.
     */
-    static void Bin16ToHex(const uint16_t aByte, HexChar* const aChars) {
-        aChars[0] = Bin4ToHex((aByte >> 12) & NYBBLE_0);
-        aChars[1] = Bin4ToHex((aByte >> 8) & NYBBLE_0);
-        aChars[2] = Bin4ToHex((aByte >> 4) & NYBBLE_0);
-        aChars[3] = Bin4ToHex(aByte & NYBBLE_0);
+    static void bin16ToHex(const uint16_t aByte, HexChar* const aChars) {
+        aChars[0] = bin4ToHex((aByte >> 12) & NYBBLE_0);
+        aChars[1] = bin4ToHex((aByte >> 8) & NYBBLE_0);
+        aChars[2] = bin4ToHex((aByte >> 4) & NYBBLE_0);
+        aChars[3] = bin4ToHex(aByte & NYBBLE_0);
     }
 
     /*!
@@ -157,15 +157,15 @@ namespace Solaire {
         \param aByte The binary data.
         \param aChars The address to write the hex characters into.
     */
-    static void Bin32ToHex(const uint32_t aByte, HexChar* const aChars) {
-        aChars[0] = Bin4ToHex((aByte >> 28) & NYBBLE_0);
-        aChars[1] = Bin4ToHex((aByte >> 24) & NYBBLE_0);
-        aChars[2] = Bin4ToHex((aByte >> 20) & NYBBLE_0);
-        aChars[3] = Bin4ToHex((aByte >> 16) & NYBBLE_0);
-        aChars[4] = Bin4ToHex((aByte >> 12) & NYBBLE_0);
-        aChars[5] = Bin4ToHex((aByte >> 8) & NYBBLE_0);
-        aChars[6] = Bin4ToHex((aByte >> 4) & NYBBLE_0);
-        aChars[7] = Bin4ToHex(aByte & NYBBLE_0);
+    static void bin32ToHex(const uint32_t aByte, HexChar* const aChars) {
+        aChars[0] = bin4ToHex((aByte >> 28) & NYBBLE_0);
+        aChars[1] = bin4ToHex((aByte >> 24) & NYBBLE_0);
+        aChars[2] = bin4ToHex((aByte >> 20) & NYBBLE_0);
+        aChars[3] = bin4ToHex((aByte >> 16) & NYBBLE_0);
+        aChars[4] = bin4ToHex((aByte >> 12) & NYBBLE_0);
+        aChars[5] = bin4ToHex((aByte >> 8) & NYBBLE_0);
+        aChars[6] = bin4ToHex((aByte >> 4) & NYBBLE_0);
+        aChars[7] = bin4ToHex(aByte & NYBBLE_0);
     }
 
     /*!
@@ -173,23 +173,23 @@ namespace Solaire {
         \param aByte The binary data.
         \param aChars The address to write the hex characters into.
     */
-    static void Bin64ToHex(const uint32_t aByte, HexChar* const aChars) {
-        aChars[0] = Bin4ToHex((aByte >> 60L) & NYBBLE_0);
-        aChars[1] = Bin4ToHex((aByte >> 56L) & NYBBLE_0);
-        aChars[2] = Bin4ToHex((aByte >> 52L) & NYBBLE_0);
-        aChars[3] = Bin4ToHex((aByte >> 48L) & NYBBLE_0);
-        aChars[4] = Bin4ToHex((aByte >> 44L) & NYBBLE_0);
-        aChars[5] = Bin4ToHex((aByte >> 40L) & NYBBLE_0);
-        aChars[6] = Bin4ToHex((aByte >> 36L) & NYBBLE_0);
-        aChars[7] = Bin4ToHex((aByte >> 32L) & NYBBLE_0);
-        aChars[8] = Bin4ToHex((aByte >> 28L) & NYBBLE_0);
-        aChars[9] = Bin4ToHex((aByte >> 24L) & NYBBLE_0);
-        aChars[10] = Bin4ToHex((aByte >> 20L) & NYBBLE_0);
-        aChars[11] = Bin4ToHex((aByte >> 16L) & NYBBLE_0);
-        aChars[12] = Bin4ToHex((aByte >> 12L) & NYBBLE_0);
-        aChars[13] = Bin4ToHex((aByte >> 8L) & NYBBLE_0);
-        aChars[14] = Bin4ToHex((aByte >> 4L) & NYBBLE_0);
-        aChars[15] = Bin4ToHex(aByte & NYBBLE_0);
+    static void bin64ToHex(const uint32_t aByte, HexChar* const aChars) {
+        aChars[0] = bin4ToHex((aByte >> 60L) & NYBBLE_0);
+        aChars[1] = bin4ToHex((aByte >> 56L) & NYBBLE_0);
+        aChars[2] = bin4ToHex((aByte >> 52L) & NYBBLE_0);
+        aChars[3] = bin4ToHex((aByte >> 48L) & NYBBLE_0);
+        aChars[4] = bin4ToHex((aByte >> 44L) & NYBBLE_0);
+        aChars[5] = bin4ToHex((aByte >> 40L) & NYBBLE_0);
+        aChars[6] = bin4ToHex((aByte >> 36L) & NYBBLE_0);
+        aChars[7] = bin4ToHex((aByte >> 32L) & NYBBLE_0);
+        aChars[8] = bin4ToHex((aByte >> 28L) & NYBBLE_0);
+        aChars[9] = bin4ToHex((aByte >> 24L) & NYBBLE_0);
+        aChars[10] = bin4ToHex((aByte >> 20L) & NYBBLE_0);
+        aChars[11] = bin4ToHex((aByte >> 16L) & NYBBLE_0);
+        aChars[12] = bin4ToHex((aByte >> 12L) & NYBBLE_0);
+        aChars[13] = bin4ToHex((aByte >> 8L) & NYBBLE_0);
+        aChars[14] = bin4ToHex((aByte >> 4L) & NYBBLE_0);
+        aChars[15] = bin4ToHex(aByte & NYBBLE_0);
     }
 
     /*!
@@ -197,7 +197,7 @@ namespace Solaire {
         \param aBinaryLength The number of bytes to represent.
         \return The number of characters required.
     */
-    static constexpr uint32_t BinaryToHexLength(const uint32_t aBinaryLength) {
+    static constexpr uint32_t binaryToHexLength(const uint32_t aBinaryLength) {
         return aBinaryLength * 2;
     }
 
@@ -206,7 +206,7 @@ namespace Solaire {
         \param aBinaryLength The number of characters to represent.
         \return The number of bytes required.
     */
-    static constexpr uint32_t HexToBinaryLength(const uint32_t aHexLength) {
+    static constexpr uint32_t hexToBinaryLength(const uint32_t aHexLength) {
         return (aHexLength >> 1) + (aHexLength & BIT_0);
     }
 
@@ -218,35 +218,35 @@ namespace Solaire {
         \param aHexLength The number of writeable chars pointed to be \a aHex.
         \return False if \a aHexLength is not long enough to contain the hexadecimal representation.
     */
-    static bool BinaryToHex(const void* const aBinary, const uint32_t aBinaryLength, HexChar* const aHex, const uint32_t aHexLength) {
-        if(aHexLength < BinaryToHexLength(aBinaryLength)) return false;
+    static bool binaryToHex(const void* const aBinary, const uint32_t aBinaryLength, HexChar* const aHex, const uint32_t aHexLength) {
+        if(aHexLength < binaryToHexLength(aBinaryLength)) return false;
         const uint8_t* const bin = static_cast<const uint8_t*>(aBinary);
         HexChar* hex = aHex;
         int32_t bytes = aBinaryLength - 1;
 
         while(bytes >= 7) {
             bytes -= 7;
-            Bin64ToHex(*reinterpret_cast<const uint64_t*>(bin + bytes), hex);
+            bin64ToHex(*reinterpret_cast<const uint64_t*>(bin + bytes), hex);
             --bytes;
             hex += 16;
         }
 
         if(bytes >= 3) {
             bytes -= 3;
-            Bin32ToHex(*reinterpret_cast<const uint32_t*>(bin + bytes), hex);
+            bin32ToHex(*reinterpret_cast<const uint32_t*>(bin + bytes), hex);
             --bytes;
             hex += 8;
         }
 
         if(bytes >= 1) {
             --bytes;
-            Bin16ToHex(*reinterpret_cast<const uint16_t*>(bin + bytes), hex);
+            bin16ToHex(*reinterpret_cast<const uint16_t*>(bin + bytes), hex);
             --bytes;
             hex += 4;
         }
 
         if(bytes >= 0) {
-            Bin8ToHex(bin[bytes], hex);
+            bin8ToHex(bin[bytes], hex);
             --bytes;
             hex += 2;
         }
@@ -262,8 +262,8 @@ namespace Solaire {
         \param aBinaryLength The number of bytes pointed to by \a aBinary.
         \return False if aBinaryLength is too small to store the binary representation.
     */
-    static bool HexToBinary(const HexChar* const aHex, const uint32_t aHexLength, void* const aBinary, const uint32_t aBinaryLength) {
-        if(aHexLength < HexToBinaryLength(aHexLength)) return false;
+    static bool hexToBinary(const HexChar* const aHex, const uint32_t aHexLength, void* const aBinary, const uint32_t aBinaryLength) {
+        if(aHexLength < hexToBinaryLength(aHexLength)) return false;
         const HexChar* hex = aHex;
         const HexChar* end = hex + aHexLength;
         uint8_t* bin = static_cast<uint8_t*>(aBinary) + (aBinaryLength - 1);
@@ -271,34 +271,34 @@ namespace Solaire {
         // Convert all paired characters
         while((end - hex) >= 16) {
             bin -= 7;
-            *reinterpret_cast<uint64_t*>(bin) = HexToBin64(hex);
+            *reinterpret_cast<uint64_t*>(bin) = hexToBin64(hex);
             hex += 16;
             --bin;
         }
 
         if((end - hex) >= 8) {
             bin -= 3;
-            *reinterpret_cast<uint32_t*>(bin) = HexToBin32(hex);
+            *reinterpret_cast<uint32_t*>(bin) = hexToBin32(hex);
             hex += 8;
             --bin;
         }
 
         if((end - hex) >= 4) {
             --bin;
-            *reinterpret_cast<uint16_t*>(bin) = HexToBin16(hex);
+            *reinterpret_cast<uint16_t*>(bin) = hexToBin16(hex);
             hex += 4;
             --bin;
         }
 
         if((end - hex) >= 2) {
-            *bin = HexToBin8(hex);
+            *bin = hexToBin8(hex);
             hex += 2;
             --bin;
         }
 
         // Convert trailing character, if present
         if((end - hex) == 1) {
-            *bin = HexToBin4(*hex) << 4;
+            *bin = hexToBin4(*hex) << 4;
         }
         return true;
     }

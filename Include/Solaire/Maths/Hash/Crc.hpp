@@ -126,12 +126,12 @@ namespace Solaire {
 
             while(ptr != end){
                 uint8_t data = *(ptr++);
-                if(REFLECT_DATA) data = Reflect<uint8_t>(data);
+                if(REFLECT_DATA) data = reflect<uint8_t>(data);
                 data ^= remainder >> (WIDTH - 8);
                 remainder = CRC_TABLE[data] ^ (remainder << 8);
             }
 
-            return (REFLECT_REMAINDER ? Reflect<T>(remainder): remainder) ^ FINAL_XOR_VALUE;
+            return (REFLECT_REMAINDER ? reflect<T>(remainder): remainder) ^ FINAL_XOR_VALUE;
         }
     };
 

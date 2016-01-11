@@ -67,110 +67,110 @@ namespace Solaire {
 		};
     }
 
-	static constexpr uint8_t Reflect8(const uint8_t aValue) throw() {
+	static constexpr uint8_t reflect8(const uint8_t aValue) throw() {
 		return Implementation::REFLECTED_BYTES[aValue];
 	}
 
-	static constexpr uint8_t Reflect4(const uint8_t aValue) throw() {
-		return Reflect8(aValue) >> 4;
+	static constexpr uint8_t reflect4(const uint8_t aValue) throw() {
+		return reflect8(aValue) >> 4;
 	}
 
-	static constexpr uint16_t Reflect16(const uint16_t aValue) throw() {
+	static constexpr uint16_t reflect16(const uint16_t aValue) throw() {
 		return
-			static_cast<uint16_t>(Reflect8(aValue >> 8)) |
-			(static_cast<uint16_t>(Reflect8(aValue & NYBBLE_0)) << 8);
+			static_cast<uint16_t>(reflect8(aValue >> 8)) |
+			(static_cast<uint16_t>(reflect8(aValue & NYBBLE_0)) << 8);
     }
 
-	static constexpr uint32_t Reflect32(const uint32_t aValue) throw() {
+	static constexpr uint32_t reflect32(const uint32_t aValue) throw() {
 		return
-			static_cast<uint32_t>(Reflect16(aValue >> 16)) |
-			(static_cast<uint32_t>(Reflect16(aValue & SHORT_0)) << 16);
+			static_cast<uint32_t>(reflect16(aValue >> 16)) |
+			(static_cast<uint32_t>(reflect16(aValue & SHORT_0)) << 16);
     }
 
-    static constexpr uint8_t Reflect64(const uint64_t aValue) throw() {
+    static constexpr uint8_t reflect64(const uint64_t aValue) throw() {
 		return
-			static_cast<uint32_t>(Reflect32(aValue >> 32L)) |
-			(static_cast<uint32_t>(Reflect32(aValue & INT_0)) << 32L);
+			static_cast<uint32_t>(reflect32(aValue >> 32L)) |
+			(static_cast<uint32_t>(reflect32(aValue & INT_0)) << 32L);
     }
 
-	static void Reflect(void* const aDst, const void* const aSrc, uint32_t aBytes) {
+	static void reflect(void* const aDst, const void* const aSrc, uint32_t aBytes) {
 		uint8_t* dst = static_cast<uint8_t*>(aDst) + aBytes - 1;
 		const uint8_t* src = static_cast<const uint8_t*>(aSrc);
 
 		while(aBytes >= 8) {
-			*reinterpret_cast<uint64_t*>(dst) = Reflect64(*reinterpret_cast<const uint64_t*>(src));
+			*reinterpret_cast<uint64_t*>(dst) = reflect64(*reinterpret_cast<const uint64_t*>(src));
 			dst -= 8;
 			src += 8;
 			aBytes -= 8;
 		}
 
 		if(aBytes >= 4) {
-			*reinterpret_cast<uint32_t*>(dst) = Reflect32(*reinterpret_cast<const uint32_t*>(src));
+			*reinterpret_cast<uint32_t*>(dst) = reflect32(*reinterpret_cast<const uint32_t*>(src));
 			dst -= 4;
 			src += 4;
 			aBytes -= 4;
 		}
 
 		if(aBytes >= 2) {
-			*reinterpret_cast<uint16_t*>(dst) = Reflect16(*reinterpret_cast<const uint16_t*>(src));
+			*reinterpret_cast<uint16_t*>(dst) = reflect16(*reinterpret_cast<const uint16_t*>(src));
 			dst -= 2;
 			src += 2;
 			aBytes -= 2;
 		}
 
 		if(aBytes == 1) {
-			*dst = Reflect8(*src);
+			*dst = reflect8(*src);
 		}
 	}
 
 	template<class T>
-	static constexpr T Reflect(const T aValue) throw();
+	static constexpr T reflect(const T aValue) throw();
 
 	template<>
-	constexpr uint8_t Reflect<uint8_t>(const uint8_t aValue) throw() {
-		return Reflect8(aValue);
+	constexpr uint8_t reflect<uint8_t>(const uint8_t aValue) throw() {
+		return reflect8(aValue);
 	}
 
 	template<>
-	constexpr uint16_t Reflect<uint16_t>(const uint16_t aValue) throw() {
-		return Reflect16(aValue);
+	constexpr uint16_t reflect<uint16_t>(const uint16_t aValue) throw() {
+		return reflect16(aValue);
 	}
 
 	template<>
-	constexpr uint32_t Reflect<uint32_t>(const uint32_t aValue) throw() {
-		return Reflect32(aValue);
+	constexpr uint32_t reflect<uint32_t>(const uint32_t aValue) throw() {
+		return reflect32(aValue);
 	}
 
 	template<>
-	constexpr uint64_t Reflect<uint64_t>(const uint64_t aValue) throw() {
-		return Reflect64(aValue);
+	constexpr uint64_t reflect<uint64_t>(const uint64_t aValue) throw() {
+		return reflect64(aValue);
 	}
 
 	template<>
-	constexpr int8_t Reflect<int8_t>(const int8_t aValue) throw() {
+	constexpr int8_t reflect<int8_t>(const int8_t aValue) throw() {
 		return *reinterpret_cast<const int8_t*>(
-			Reflect8(*reinterpret_cast<const uint8_t*>(&aValue))
+			reflect8(*reinterpret_cast<const uint8_t*>(&aValue))
 		);
 	}
 
 	template<>
-	constexpr int16_t Reflect<int16_t>(const int16_t aValue) throw() {
+	constexpr int16_t reflect<int16_t>(const int16_t aValue) throw() {
 		return *reinterpret_cast<const int16_t*>(
-			Reflect16(*reinterpret_cast<const uint16_t*>(&aValue))
+			reflect16(*reinterpret_cast<const uint16_t*>(&aValue))
 		);
 	}
 
 	template<>
-	constexpr int32_t Reflect<int32_t>(const int32_t aValue) throw() {
+	constexpr int32_t reflect<int32_t>(const int32_t aValue) throw() {
 		return *reinterpret_cast<const int32_t*>(
-			Reflect32(*reinterpret_cast<const uint32_t*>(&aValue))
+			reflect32(*reinterpret_cast<const uint32_t*>(&aValue))
 		);
 	}
 
 	template<>
-	constexpr int64_t Reflect<int64_t>(const int64_t aValue) throw() {
+	constexpr int64_t reflect<int64_t>(const int64_t aValue) throw() {
 		return *reinterpret_cast<const int64_t*>(
-			Reflect64(*reinterpret_cast<const uint64_t*>(&aValue))
+			reflect64(*reinterpret_cast<const uint64_t*>(&aValue))
 		);
 	}
 }

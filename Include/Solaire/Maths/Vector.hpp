@@ -129,8 +129,8 @@ namespace Solaire {
         template<const uint32_t Length1, const uint32_t Length2, class ENABLE = typename std::enable_if<Length1 + Length2 == Length>::type>
 	    Vector(const Vector<Scalar, Length1> aFirst, const Vector<Scalar, Length2> aSecond) throw() {
 	        // Copy the elements from the Vectors into this Vector
-	        std::memcpy(mData, aFirst.Ptr(), sizeof(Scalar) * Length1);
-	        std::memcpy(mData + Length1, aSecond.Ptr(), sizeof(Scalar) * Length2);
+	        std::memcpy(mData, aFirst.ptr(), sizeof(Scalar) * Length1);
+	        std::memcpy(mData + Length1, aSecond.ptr(), sizeof(Scalar) * Length2);
 	    }
 
         /*!
@@ -147,9 +147,9 @@ namespace Solaire {
         template<const uint32_t Length1, const uint32_t Length2, const uint32_t Length3, class ENABLE = typename std::enable_if<Length1 + Length2 + Length3 == Length>::type>
 	    Vector(const Vector<Scalar, Length1> aFirst, const Vector<Scalar, Length2> aSecond, const Vector<Scalar, Length3> aThird) throw() {
 	        // Copy the elements from the Vectors into this Vector
-	        std::memcpy(mData, aFirst.Ptr(), sizeof(Scalar) * Length1);
-	        std::memcpy(mData + Length1, aSecond.Ptr(), sizeof(Scalar) * Length2);
-	        std::memcpy(mData + Length1 + Length2, aThird.Ptr(), sizeof(Scalar) * Length3);
+	        std::memcpy(mData, aFirst.ptr(), sizeof(Scalar) * Length1);
+	        std::memcpy(mData + Length1, aSecond.ptr(), sizeof(Scalar) * Length2);
+	        std::memcpy(mData + Length1 + Length2, aThird.ptr(), sizeof(Scalar) * Length3);
 	    }
 
         /*!
@@ -168,10 +168,10 @@ namespace Solaire {
         template<const uint32_t Length1, const uint32_t Length2, const uint32_t Length3, const uint32_t Length4, class ENABLE = typename std::enable_if<Length1 + Length2 + Length3 + Length4 == Length>::type>
 	    Vector(const Vector<Scalar, Length1> aFirst, const Vector<Scalar, Length2> aSecond, const Vector<Scalar, Length3> aThird, const Vector<Scalar, Length4> aFourth) throw() {
 	        // Copy the elements from the Vectors into this Vector
-	        std::memcpy(mData, aFirst.Ptr(), sizeof(Scalar) * Length1);
-	        std::memcpy(mData + Length1, aSecond.Ptr(), sizeof(Scalar) * Length2);
-	        std::memcpy(mData + Length1 + Length2, aThird.Ptr(), sizeof(Scalar) * Length3);
-	        std::memcpy(mData + Length1 + Length2 + Length3, aFourth.Ptr(), sizeof(Scalar) * Length4);
+	        std::memcpy(mData, aFirst.ptr(), sizeof(Scalar) * Length1);
+	        std::memcpy(mData + Length1, aSecond.ptr(), sizeof(Scalar) * Length2);
+	        std::memcpy(mData + Length1 + Length2, aThird.ptr(), sizeof(Scalar) * Length3);
+	        std::memcpy(mData + Length1 + Length2 + Length3, aFourth.ptr(), sizeof(Scalar) * Length4);
 	    }
 
 	    // C++ Operators
@@ -258,7 +258,7 @@ namespace Solaire {
             \return True if this vector is less than \a aOther.
         */
 		bool operator<(const Vector<Scalar, Length> aOther) const throw() {
-			return MagnitudeSquared() < aOther.MagnitudeSquared();
+			return magnitudeSquared() < aOther.magnitudeSquared();
 		}
 
         /*!
@@ -268,7 +268,7 @@ namespace Solaire {
             \return True if this vector is greater than \a aOther.
         */
 		bool operator>(const Vector<Scalar, Length> aOther) const throw() {
-			return MagnitudeSquared() > aOther.MagnitudeSquared();
+			return magnitudeSquared() > aOther.magnitudeSquared();
 		}
 
         /*!
@@ -278,7 +278,7 @@ namespace Solaire {
             \return True if this vector is less than, or equal to \a aOther.
         */
 		bool operator<=(const Vector<Scalar, Length> aOther) const throw() {
-			return MagnitudeSquared() <= aOther.MagnitudeSquared();
+			return magnitudeSquared() <= aOther.magnitudeSquared();
 		}
 
         /*!
@@ -288,7 +288,7 @@ namespace Solaire {
             \return True if this vector is greater than, or equal to \a aOther.
         */
 		bool operator>=(const Vector<Scalar, Length> aOther) const throw() {
-			return MagnitudeSquared() >= aOther.MagnitudeSquared();
+			return magnitudeSquared() >= aOther.magnitudeSquared();
 		}
 
 		// Utility / Mathmatical helpers
@@ -297,7 +297,7 @@ namespace Solaire {
             \brief Access the vector like a C-style array.
             \return The address of the first element.
         */
-		Scalar* Ptr() throw() {
+		Scalar* ptr() throw() {
 		    return mData;
 		}
 
@@ -305,7 +305,7 @@ namespace Solaire {
             \brief Access the vector like a C-style array.
             \return The address of the first element.
         */
-		const Scalar* Ptr() const throw() {
+		const Scalar* ptr() const throw() {
 		    return mData;
 		}
 
@@ -313,7 +313,7 @@ namespace Solaire {
             \brief Calculate the sum of all elements in the vector.
             \return The sum.
         */
-		Scalar Sum() const throw() {
+		Scalar sum() const throw() {
 			Scalar sum = static_cast<Scalar>(0);
 			for(uint32_t i = 0; i < Length; ++i) sum += mData[i];
 			return sum;
@@ -323,8 +323,8 @@ namespace Solaire {
             \brief Calculate the mean element in the vector.
             \return The mean element.
         */
-		Scalar Average() const throw() {
-			return Sum() / static_cast<Scalar>(Length);
+		Scalar average() const throw() {
+			return sum() / static_cast<Scalar>(Length);
 		}
 
         /*!
@@ -333,7 +333,7 @@ namespace Solaire {
             \return The square of the magnitude.
             \see Magnitude
         */
-       Scalar MagnitudeSquared() const throw() {
+       Scalar magnitudeSquared() const throw() {
 			Scalar tmp = static_cast<Scalar>(0);
 			for (uint32_t i = 0; i < Length; ++i){
 				tmp += mData[i] * mData[i];
@@ -346,16 +346,16 @@ namespace Solaire {
             \return The magnitude.
             \see MagnitudeSquared
         */
-		Scalar Magnitude(const T* const aVector) const throw() {
-			return static_cast<Scalar>(std::sqrt(static_cast<double>(MagnitudeSquared(aVector))));
+		Scalar magnitude(const T* const aVector) const throw() {
+			return static_cast<Scalar>(std::sqrt(static_cast<double>(magnitudeSquared(aVector))));
 		}
 
         /*!
             \brief Compute normalised form of this vector.
             \return The normalised unit vector.
         */
-		Vector<Scalar, Length> Normalise() const throw() {
-			return Vector<Scalar, Length>(*this) / Magnitude();
+		Vector<Scalar, Length> normalise() const throw() {
+			return Vector<Scalar, Length>(*this) / magnitude();
 		}
 
         /*!
@@ -363,7 +363,7 @@ namespace Solaire {
             \param aOther The second vector.
             \return The dot product.
         */
-		Scalar DotProduct(const Vector<Scalar, Length> aOther) const throw() {
+		Scalar dotProduct(const Vector<Scalar, Length> aOther) const throw() {
 			Scalar tmp = static_cast<Scalar>(0);
 			for (uint32_t i = 0; i < Length; ++i) {
 				tmp += mData[i] * aOther.mData[i];
@@ -380,7 +380,7 @@ namespace Solaire {
             \return The cross product.
         */
 		template<const uint32_t L = LENGTH, typename ENABLE = typename std::enable_if<L == 3>::type>
-		Vector<Scalar, Length> CrossProduct(const Vector<Scalar, Length> aOther) const throw() {
+		Vector<Scalar, Length> crossProduct(const Vector<Scalar, Length> aOther) const throw() {
 		    return {
                 (mData[1] * aOther.mData[2]) - (mData[2] * aOther.mData[1]),    // (Y1 * Z2) - (Z2 * Y1)
                 (mData[2] * aOther.mData[0]) - (mData[0] * aOther.mData[2]),    // (Z1 * X2) - (X2 * Z1)
@@ -400,7 +400,7 @@ namespace Solaire {
             \param aWeight The weighting bias for this vector.
             \return The interpolated vector.
         */
-		Vector<Scalar, Length> Lerp(const Vector<Scalar, Length> aOther, const double aWeight) const throw() {
+		Vector<Scalar, Length> lerp(const Vector<Scalar, Length> aOther, const double aWeight) const throw() {
 		    Vector<Scalar, Length> tmp;
 			for(uint32_t i = 0; i < Length; ++i) {
 				tmp[i] = static_cast<Scalar>((1.0 - aWeight) * static_cast<double>(mData[i]) + aWeight * static_cast<double>(aOther.mData[i]));
@@ -434,7 +434,7 @@ namespace Solaire {
             \return The new vector.
         */
         template<class Scalar2, const uint32_t Length2>
-		Vector<Scalar, Length2> Swizzle(const Vector<Scalar2, Length2> aSwizzle)  throw() {
+		Vector<Scalar, Length2> swizzle(const Vector<Scalar2, Length2> aSwizzle)  throw() {
 			Vector<Scalar, Length> tmp;
 			for(uint32_t i = 0; i < Length2; ++i) {
 				tmp[i] = mData[aSwizzle[i]];

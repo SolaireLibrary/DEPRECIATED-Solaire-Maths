@@ -140,7 +140,7 @@ namespace Solaire {
 	        Matrix<Scalar2, Width, Height> tmp;
 
 	        // Convert each element
-	        const Scalar* const ptr = tmp.Ptr();
+	        const Scalar* const ptr = tmp.ptr();
 	        for(uint32_t i = 0; i < Size; ++i){
                 ptr[i] = static_cast<Scalar2>(mData[i]);
 	        }
@@ -154,11 +154,11 @@ namespace Solaire {
             \tparam H Used for conditional compilation.
             \tparam ENABLE Used for conditional compilation.
             \return The transposed Matrix.
-            \see Transpose
+            \see transpose
         */
         template<const uint32_t W = Width, const uint32_t H = Height, class ENABLE = typename std::enable_if<W != H>::type>
 	    explicit operator Matrix<Scalar, Height, Width>() const throw() {
-	       return Transpose();
+	       return transpose();
 	    }
 
         /*!
@@ -166,7 +166,7 @@ namespace Solaire {
             \param aIndex The index of the Row.
             \return The address of the Row.
             \see Row
-            \see GetRow
+            \see getRow
         */
 		const Scalar* operator[](const uint32_t aIndex) const throw() {
 			return mData + (aIndex * Width);
@@ -177,7 +177,7 @@ namespace Solaire {
             \param aIndex The index of the Row.
             \return The address of the Row.
             \see Row
-            \see GetRow
+            \see getRow
         */
 		Scalar* operator[](const uint32_t aIndex) throw() {
 			return mData + (aIndex * Width);
@@ -207,7 +207,7 @@ namespace Solaire {
             \brief Access the elements of this Matrix as a C-style array.
             \return The address of index [0,0].
         */
-		const Scalar* Ptr() const throw() {
+		const Scalar* ptr() const throw() {
 			return mData;
 		}
 
@@ -215,7 +215,7 @@ namespace Solaire {
             \brief Access the elements of this Matrix as a C-style array.
             \return The address of index [0,0].
         */
-		Scalar* Ptr() throw() {
+		Scalar* ptr() throw() {
 			return mData;
 		}
 
@@ -223,9 +223,9 @@ namespace Solaire {
             \brief Get a Row of the matrix.
             \param The index of the Row to get.
             \see Row
-            \see SetRow
+            \see setRow
         */
-		Row& GetRow(const uint32_t aIndex) throw() {
+		Row& getRow(const uint32_t aIndex) throw() {
 		    return *reinterpret_cast<Row*>(mData + (aIndex * Width));
 		}
 
@@ -233,9 +233,9 @@ namespace Solaire {
             \brief Get a Row of the matrix.
             \param The index of the Row to get.
             \see Row
-            \see SetRow
+            \see setRow
         */
-		Row GetRow(const uint32_t aIndex) const throw() {
+		Row getRow(const uint32_t aIndex) const throw() {
 		    return *reinterpret_cast<const Row*>(mData + (aIndex * Width));
 		}
 
@@ -243,9 +243,9 @@ namespace Solaire {
             \brief Get a Column of the matrix.
             \param The index of the Column to get.
             \see Column
-            \see SetColumn
+            \see setColumn
         */
-		Column GetColumn(const uint32_t aIndex) const throw() {
+		Column getColumn(const uint32_t aIndex) const throw() {
 		    Column tmp;
 			for(uint32_t i = 0; i < Height; ++i) {
 				tmp[i] = mData[i * Width + aIndex];
@@ -258,9 +258,9 @@ namespace Solaire {
             \brief aIndex The index of the Row to set.
             \brief aRow The value to set the Row to.
             \see Row
-            \see GetRow
+            \see getRow
         */
-		void SetRow(const uint32_t aIndex, const Row aRow) throw() {
+		void setRow(const uint32_t aIndex, const Row aRow) throw() {
 			std::memcpy(mData + Width * aIndex, aRow.Ptr(), sizeof(Scalar) * Width);
 		}
 
@@ -269,9 +269,9 @@ namespace Solaire {
             \brief aIndex The index of the Column to set.
             \brief aColumn The value to set the column to.
             \see Column
-            \see GetColumn
+            \see getColumn
         */
-		void SetColumn(const uint32_t aIndex, const Column aColumn) throw() {
+		void setColumn(const uint32_t aIndex, const Column aColumn) throw() {
 			for(uint32_t i = 0; i < Height; ++i) {
 				mData[i * Width + aIndex] = aColumn[i];
 			}
@@ -285,10 +285,10 @@ namespace Solaire {
         /*!
             \brief Rotate this Matrix by 90 degrees.
         */
-		Matrix<Scalar, Height, Width> Transpose() const throw() {
+		Matrix<Scalar, Height, Width> transpose() const throw() {
 			Matrix<Scalar, Height, Width> tmp;
 			for(uint32_t i = 0; i < Width; ++i) {
-				tmp.SetColumn(i, GetRow(i));
+				tmp.setColumn(i, getRow(i));
 			}
 			return tmp;
 		}

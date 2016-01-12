@@ -142,6 +142,154 @@ namespace Solaire {
         }
     };
 
+    class HexToBinOStream : public OStream {
+    private:
+        OStream& mStream;
+        HexChar mBuffer[2];
+        bool mBufferSet;
+    private:
+        void pushByte(const HexChar aValue) throw() {
+            if(mBufferSet) {
+                mBuffer[0] = aValue;
+                mBufferSet = true;
+            }else {
+                mBuffer[1] = aValue;
+                mBufferSet = false;
+                mStream << hexToBin8(mBuffer);
+            }
+        }
+
+        // Inherited from OStream
+
+        void SOLAIRE_EXPORT_CALL writeU8(const uint8_t aValue) throw() override {
+            pushByte(*reinterpret_cast<const HexChar*>(aValue));
+        }
+
+        void SOLAIRE_EXPORT_CALL writeU16(const uint16_t aValue) throw() override {
+            if(mBufferSet) {
+                const HexChar* const ptr = reinterpret_cast<const HexChar*>(&aValue);
+                pushByte(ptr[0]);
+                pushByte(ptr[1]);
+            }else {
+                mStream << hexToBin8(reinterpret_cast<const HexChar*>(&aValue));
+            }
+        }
+
+        void SOLAIRE_EXPORT_CALL writeU32(const uint32_t aValue) throw() override {
+            if(mBufferSet) {
+                const HexChar* const ptr = reinterpret_cast<const HexChar*>(&aValue);
+                pushByte(ptr[0]);
+                mStream << hexToBin8(ptr + 1);
+                pushByte(ptr[3]);
+            }else {
+                mStream << hexToBin16(reinterpret_cast<const HexChar*>(&aValue));
+            }
+        }
+
+        void SOLAIRE_EXPORT_CALL writeU64(const uint64_t aValue) throw() override {
+            if(mBufferSet) {
+                const HexChar* const ptr = reinterpret_cast<const HexChar*>(&aValue);
+                pushByte(ptr[0]);
+                mStream << hexToBin16(ptr + 1);
+                mStream << hexToBin8(ptr + 5);
+                pushByte(ptr[7]);
+            }else {
+                mStream << hexToBin32(reinterpret_cast<const HexChar*>(&aValue));
+            }
+        }
+
+        void SOLAIRE_EXPORT_CALL writeI8(const int8_t aValue) throw() override {
+            pushByte(*reinterpret_cast<const HexChar*>(aValue));
+        }
+
+        void SOLAIRE_EXPORT_CALL writeI16(const int16_t aValue) throw() override {
+            if(mBufferSet) {
+                const HexChar* const ptr = reinterpret_cast<const HexChar*>(&aValue);
+                pushByte(ptr[0]);
+                pushByte(ptr[1]);
+            }else {
+                mStream << hexToBin8(reinterpret_cast<const HexChar*>(&aValue));
+            }
+        }
+
+        void SOLAIRE_EXPORT_CALL writeI32(const int32_t aValue) throw() override {
+            if(mBufferSet) {
+                const HexChar* const ptr = reinterpret_cast<const HexChar*>(&aValue);
+                pushByte(ptr[0]);
+                mStream << hexToBin8(ptr + 1);
+                pushByte(ptr[3]);
+            }else {
+                mStream << hexToBin16(reinterpret_cast<const HexChar*>(&aValue));
+            }
+        }
+
+        void SOLAIRE_EXPORT_CALL writeI64(const int64_t aValue) throw() override {
+            if(mBufferSet) {
+                const HexChar* const ptr = reinterpret_cast<const HexChar*>(&aValue);
+                pushByte(ptr[0]);
+                mStream << hexToBin16(ptr + 1);
+                mStream << hexToBin8(ptr + 5);
+                pushByte(ptr[7]);
+            }else {
+                mStream << hexToBin32(reinterpret_cast<const HexChar*>(&aValue));
+            }
+        }
+
+        void SOLAIRE_EXPORT_CALL writeF(const float aValue) throw() override {
+            //! \todo Optimise writeF
+            write(&aValue, sizeof(float));
+        }
+
+        void SOLAIRE_EXPORT_CALL writeD(const double aValue) throw() override {
+            //! \todo Optimise writeD
+            write(&aValue, sizeof(double));
+        }
+
+        void SOLAIRE_EXPORT_CALL writeC(const char aValue) throw() override {
+            pushByte(*reinterpret_cast<const HexChar*>(aValue));
+        }
+
+    public:
+        HexToBinOStream(OStream& aStream) :
+            mStream(aStream),
+            mBufferSet(false)
+        {}
+
+        SOLAIRE_EXPORT_CALL ~HexToBinOStream() {
+            // Handle trailing byte
+            if(mBufferSet){
+                pushByte('0');
+            }
+        }
+
+        // Inherited from OStream
+
+        void SOLAIRE_EXPORT_CALL write(const void* const aPtr, const uint32_t aBytes) throw() override {
+            const bool trail = aBytes & 1;
+            const uint32_t size = trail ? aBytes - 1 : aBytes;
+            const HexChar* const src = static_cast<const HexChar*>(aPtr) + (trail ? 1 : 0);
+            uint8_t* const dst = new uint8_t[size / 2];
+            if(trail) pushByte(*(src - 1));
+
+            hexToBinary(src, size, dst, size / 2);
+            mStream.write(dst, size / 2);
+
+            delete[] dst;
+        }
+
+        bool SOLAIRE_EXPORT_CALL isOffsetable() const throw() override {
+            return mStream.isOffsetable();
+        }
+
+        int32_t SOLAIRE_EXPORT_CALL getOffset() const throw() override {
+            return mStream.getOffset();
+        }
+
+        bool SOLAIRE_EXPORT_CALL setOffset(const int32_t aOffset) throw() override {
+            return mStream.setOffset(aOffset);
+        }
+    };
+
 }
 
 #endif

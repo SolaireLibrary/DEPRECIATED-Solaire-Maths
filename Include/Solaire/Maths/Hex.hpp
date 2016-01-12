@@ -32,6 +32,8 @@
 
 #include <cstdint>
 #include "Solaire/Core/Maths.hpp"
+#include "Solaire/Core/IStream.hpp"
+#include "Solaire/Core/OStream.hpp"
 
 namespace Solaire {
 
@@ -299,6 +301,44 @@ namespace Solaire {
         // Convert trailing character, if present
         if((end - hex) == 1) {
             *bin = hexToBin4(*hex) << 4;
+        }
+        return true;
+    }
+
+    /*!
+        \brief Convert binary data into it's hexadecimal representation.
+        \param aDst The stream for writing hexadecimal data.
+        \param aSrc The stream for reading binary data.
+        \return True if the data was converted correctly.
+    */
+    static bool binaryToHex(OStream& aDst, IStream& aSrc) {
+        uint8_t byte;
+        char buf[2];
+        while(! aSrc.end()) {
+            aSrc >> byte;
+            bin8ToHex(byte, buf);
+            aDst << buf[0];
+            aDst << buf[1];
+        }
+        return true;
+    }
+
+    /*!
+        \brief Convert binary data into it's hexadecimal representation.
+        \param aDst The stream for writing binary data.
+        \param aSrc The stream for reading hexadecimal data.
+        \return True if the data was converted correctly.
+    */
+    static bool hexToBinary(OStream& aDst, IStream& aSrc) {
+        char buf[2];
+        while(! aSrc.end()) {
+            aSrc >> buf[0];
+            if(aSrc.end()) {
+                buf[1] = '0';
+            }else {
+                aSrc >> buf[1];
+            }
+            aDst << hexToBin8(buf);
         }
         return true;
     }

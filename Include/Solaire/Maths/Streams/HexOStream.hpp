@@ -265,16 +265,11 @@ namespace Solaire {
         // Inherited from OStream
 
         void SOLAIRE_EXPORT_CALL write(const void* const aPtr, const uint32_t aBytes) throw() override {
-            const bool trail = aBytes & 1;
-            const uint32_t size = trail ? aBytes - 1 : aBytes;
-            const HexChar* const src = static_cast<const HexChar*>(aPtr) + (trail ? 1 : 0);
-            uint8_t* const dst = new uint8_t[size / 2];
-            if(trail) pushByte(*(src - 1));
-
-            hexToBinary(src, size, dst, size / 2);
-            mStream.write(dst, size / 2);
-
-            delete[] dst;
+            //! \todo Optimise write
+            const HexChar* const hex = static_cast<const HexChar*>(aPtr);
+            for(uint32_t i = 0; i < aBytes; ++i) {
+                pushByte(hex[i]);
+            }
         }
 
         bool SOLAIRE_EXPORT_CALL isOffsetable() const throw() override {

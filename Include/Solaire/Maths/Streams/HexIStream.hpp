@@ -309,7 +309,7 @@ namespace Solaire {
         }
 
         bool SOLAIRE_EXPORT_CALL end() const throw() override {
-            return mStream.end();
+            return mStream.end() && ! mBufferSet;
         }
 
     };

@@ -20,13 +20,13 @@
 // GitHub repository : https://github.com/SolaireLibrary/SolaireCPP
 
 /*!
-	\file ComtaomerIStream.hpp
+	\file HexIStream.hpp
 	\brief
 	\author
 	Created			: Adam Smith
 	Last modified	: Adam Smith
 	\date
-	Created			: 20th November 2015
+	Created			: 12th January 2016
 	Last Modified	: 12th January 2016
 */
 

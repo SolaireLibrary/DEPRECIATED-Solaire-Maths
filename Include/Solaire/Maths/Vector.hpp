@@ -69,51 +69,51 @@ namespace Solaire {
     private:
         Scalar mData[Length];   //!< Stores the scalar elements of this Vector.
     public:
-        Scalar getX() const throw() {
+        inline Scalar getX() const throw() {
             return mData[0];
         }
 
-        Scalar& getX() throw() {
+        inline Scalar& getX() throw() {
             return mData[0];
         }
 
-        void setX(const Scalar aScalar) throw() {
+        inline void setX(const Scalar aScalar) throw() {
             mData[0] = aScalar;
         }
 
-        Scalar getY() const throw() {
+        inline Scalar getY() const throw() {
             return mData[1];
         }
 
-        Scalar& getY() throw() {
+        inline Scalar& getY() throw() {
             return mData[1];
         }
 
-        void setY(const Scalar aScalar) throw() {
+        inline void setY(const Scalar aScalar) throw() {
             mData[1] = aScalar;
         }
 
-        Scalar getZ() const throw() {
+        inline Scalar getZ() const throw() {
             return mData[2];
         }
 
-        Scalar& getZ() throw() {
+        inline Scalar& getZ() throw() {
             return mData[2];
         }
 
-        void setZ(const Scalar aScalar) throw() {
+        inline void setZ(const Scalar aScalar) throw() {
             mData[2] = aScalar;
         }
 
-        Scalar getW() const throw() {
+        inline Scalar getW() const throw() {
             return mData[3];
         }
 
-        Scalar& getW() throw() {
+        inline Scalar& getW() throw() {
             return mData[3];
         }
 
-        void setW(const Scalar aScalar) throw() {
+        inline void setW(const Scalar aScalar) throw() {
             mData[3] = aScalar;
         }
     #if SOLAIRE_COMPILER == SOLAIRE_MSVC
@@ -401,7 +401,7 @@ namespace Solaire {
             \return The magnitude.
             \see MagnitudeSquared
         */
-		Scalar magnitude(const T* const aVector) const throw() {
+		Scalar magnitude() const throw() {
 			return static_cast<Scalar>(std::sqrt(static_cast<double>(magnitudeSquared(aVector))));
 		}
 

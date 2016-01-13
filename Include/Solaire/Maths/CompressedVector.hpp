@@ -289,6 +289,12 @@ namespace Solaire { namespace Test {
 		}
 
 		//! \todo Swizzle
+
+		explicit operator Vector<Scalar, Size>() const {
+		    Vector<Scalar, Size> tmp;
+            for(uint32_t i = 0; i < Size; ++i) tmp[i] = operator[](i);
+            return tmp;
+		}
     };
 
     template<class T>

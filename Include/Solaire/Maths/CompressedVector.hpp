@@ -133,18 +133,217 @@ namespace Solaire { namespace Test {
     public:
         enum {
             TotalBits = XBITS + YBITS + ZBITS + WBITS,
-            IsByteAligned = isByteAligned(TotalBits)
+            IsByteAligned = isByteAligned(TotalBits),
+            Size = 4 // !< \todo Implement length
         };
 
         typedef ElementInfo<XBITS, XSIGN> XInfo;
         typedef ElementInfo<YBITS, YSIGN> YInfo;
         typedef ElementInfo<ZBITS, ZSIGN> ZInfo;
         typedef ElementInfo<WBITS, WSIGN> WInfo;
+
+        typedef int LargeScalar; //! \todo Implement this
+
+        typedef CompressedVector<
+            XBITS, YBITS, ZBITS, WBITS,
+            XSIGN, YSIGN, ZSIGN, WSIGN
+        > Self;
     public:
         typename XInfo::Type X : XBITS;
         typename YInfo::Type Y : YBITS;
         typename ZInfo::Type Z : ZBITS;
         typename WInfo::Type W : WBITS;
+
+        // Constructors
+
+        CompressedVector() :
+            X(0),
+            Y(0),
+            Z(0),
+            W(0)
+        {}
+
+        CompressedVector(const LargeScalar aX, const LargeScalar aY) :
+            X(aX),
+            Y(aY),
+            Z(0),
+            W(0)
+        {}
+
+        CompressedVector(const LargeScalar aX, const LargeScalar aY, const LargeScalar aZ) :
+            X(aX),
+            Y(aY),
+            Z(aZ),
+            W(0)
+        {}
+
+        CompressedVector(const LargeScalar aX, const LargeScalar aY, const LargeScalar aZ, const LargeScalar aW) :
+            X(aX),
+            Y(aY),
+            Z(aZ),
+            W(aW)
+        {}
+
+
+        // C++ operators
+
+        /*!
+            \brief Access an element of this vector.
+            \param aIndex The element to access.
+            \return A copy of the scalar element.
+        */
+	    LargeScalar operator[](const uint32_t aIndex) const throw() {
+	        switch(aIndex) {
+            case 0  : return X;
+            case 1  : return Y;
+            case 2  : return Z;
+            case 3  : return W;
+            default : return 0;
+	        }
+	    }
+
+        /*!
+            \brief Compare this vector to another.
+            \param aOther The second vector.
+            \return True if this vector is equal to \a aOther.
+        */
+		bool operator==(const Self aOther) const throw() {
+			return std::memcmp(this, &aOther, sizeof(Self)) == 0;
+		}
+
+        /*!
+            \brief Compare this vector to another.
+            \param aOther The second vector.
+            \return True if this vector is not equal to \a aOther.
+        */
+		bool operator!=(const Self aOther) const throw() {
+			return std::memcmp(this, &aOther, sizeof(Self)) != 0;
+		}
+
+        /*!
+            \brief Compare this vector to another.
+            \detail This is implemented using the (squared) magnitude.
+            \param aOther The second vector.
+            \return True if this vector is less than \a aOther.
+        */
+		bool operator<(const Self aOther) const throw() {
+			return magnitudeSquared() < aOther.magnitudeSquared();
+		}
+
+        /*!
+            \brief Compare this vector to another.
+            \detail This is implemented using the (squared) magnitude.
+            \param aOther The second vector.
+            \return True if this vector is greater than \a aOther.
+        */
+		bool operator>(const Self aOther) const throw() {
+			return magnitudeSquared() > aOther.magnitudeSquared();
+		}
+
+        /*!
+            \brief Compare this vector to another.
+            \detail This is implemented using the (squared) magnitude.
+            \param aOther The second vector.
+            \return True if this vector is less than, or equal to \a aOther.
+        */
+		bool operator<=(const Self aOther) const throw() {
+			return magnitudeSquared() <= aOther.magnitudeSquared();
+		}
+
+        /*!
+            \brief Compare this vector to another.
+            \detail This is implemented using the (squared) magnitude.
+            \param aOther The second vector.
+            \return True if this vector is greater than, or equal to \a aOther.
+        */
+		bool operator>=(const Self aOther) const throw() {
+			return magnitudeSquared() >= aOther.magnitudeSquared();
+		}
+
+        // Misc
+
+        /*!
+            \brief Calculate the sum of all elements in the vector.
+            \return The sum.
+        */
+		LargeScalar sum() const throw() {
+			return X + Y + Z + W;
+		}
+
+        /*!
+            \brief Calculate the mean element in the vector.
+            \return The mean element.
+        */
+		LargeScalar average() const throw() {
+			return sum() / Size;
+		}
+
+        /*!
+            \brief Compute square of the magnitude of this vector.
+            \detail This is faster than Magnitude().
+            \return The square of the magnitude.
+            \see Magnitude
+        */
+       LargeScalar magnitudeSquared() const throw() {
+			return (X * X) + (Y * Y) + (Z * Z) + (W * W);
+		}
+
+        /*!
+            \brief Compute magnitude of this vector.
+            \return The magnitude.
+            \see MagnitudeSquared
+        */
+		LargeScalar magnitude() const throw() {
+			return static_cast<LargeScalar>(std::sqrt(static_cast<double>(magnitudeSquared())));
+		}
+
+        /*!
+            \brief Compute normalised form of this vector.
+            \return The normalised unit vector.
+        */
+		Self normalise() const throw() {
+			return Self(*this) / magnitude();
+		}
+
+        /*!
+            \brief Compute the dot product of two vectors.
+            \param aOther The second vector.
+            \return The dot product.
+        */
+		LargeScalar dotProduct(const Self aOther) const throw() {
+			return (X * aOther.X) + (Y * aOther.Y) + (Z * aOther.Z) + (W * aOther.W);
+		}
+
+        /*!
+            \brief Compute the cross product of two vectors.
+            \param aOther The second vector.
+            \return The cross product.
+        */
+		Self crossProduct(const Self aOther) const throw() {
+		    return Self(
+                (Y * aOther.Z) - (Z * aOther.Y),
+                (Z * aOther.Z) - (X * aOther.Z),
+                (X * aOther.Y) - (Y * aOther.Z),
+                0
+		    );
+		}
+
+        /*!
+            \brief Perform linear interpolation between two vectors.
+            \param aOther The other vector.
+            \param aWeight The weighting bias for this vector.
+            \return The interpolated vector.
+        */
+		Self lerp(const Self aOther, const double aWeight) const throw() {
+			return Self(
+               static_cast<LargeScalar>((1.0 - aWeight) * static_cast<double>(X) + aWeight * static_cast<double>(aOther.X)),
+               static_cast<LargeScalar>((1.0 - aWeight) * static_cast<double>(Y) + aWeight * static_cast<double>(aOther.Y)),
+               static_cast<LargeScalar>((1.0 - aWeight) * static_cast<double>(Z) + aWeight * static_cast<double>(aOther.Z)),
+               static_cast<LargeScalar>((1.0 - aWeight) * static_cast<double>(W) + aWeight * static_cast<double>(aOther.W))
+            );
+		}
+
+		//! \todo Swizzle
     };
 
     template<class T>

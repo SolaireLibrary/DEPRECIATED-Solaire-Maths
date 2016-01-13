@@ -319,5 +319,7 @@ namespace Solaire { namespace Test {
 
 }}
 
+#include "Solaire/Maths/CompressedVector.inl"
+
 
 #endif

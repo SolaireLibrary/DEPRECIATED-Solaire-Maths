@@ -95,29 +95,6 @@ namespace Solaire { namespace Test {
             IsByteAligned = isByteAligned(Offset),
         };
         typedef BinaryBlock<BITS> Type;
-
-        static Type get(const void* const aVector) throw() {
-            if(IsByteAligned) {
-                const uint8_t* const bytes = aVector;
-                Type tmp = *reinterpret_cast<const Type*>(bytes + (Offset / 8));
-                tmp &= static_cast<Type>(MASKS[BITS]);
-            }else {
-                //! \todo Implement non aligned get
-                return Type();
-            }
-        }
-
-        static Type set(void* const aVector, const Type aValue) throw() {
-            if(IsByteAligned) {
-                uint8_t* const bytes = aVector;
-                Type& tmp = *reinterpret_cast<Type*>(bytes + (Offset / 8));
-                tmp &= ! static_cast<Type>(MASKS[BITS]);
-                tmp |= aValue;
-            }else {
-                //! \todo Implement non aligned set
-                return Type();
-            }
-        }
     };
 
     template<const uint8_t XBITS, const uint8_t YBITS, const uint8_t ZBITS, const uint8_t WBITS>
@@ -126,7 +103,13 @@ namespace Solaire { namespace Test {
             TotalBits = XBITS + YBITS + ZBITS + WBITS,
             IsByteAligned = isByteAligned(TotalBits)
         };
-        typedef BinaryBlock<TotalBits> Type;
+
+        struct Type {
+            uint8_t X : XBITS;
+            uint8_t Y : YBITS;
+            uint8_t Z : ZBITS;
+            uint8_t W : WBITS;
+        };
 
         typedef ElementInfo<
             XBITS,

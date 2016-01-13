@@ -121,7 +121,7 @@ namespace Solaire { namespace Test {
         };
 
         static constexpr float scale(const Type aValue) {
-            return static_cast<float>(aValue) / static_cast<float>(MASKS[BITS]);
+            return static_cast<float>(aValue) / static_cast<float>(Max);
         }
     };
 

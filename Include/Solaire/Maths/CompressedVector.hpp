@@ -94,30 +94,30 @@ namespace Solaire { namespace Test {
             XSIGN, YSIGN, ZSIGN, WSIGN
         > Self;
 
-
-        enum {
-            INDEX_0 =
+       enum : char {
+            Index0 =
                 XInfo::Bits > 0 ? 'X' :
                 YInfo::Bits > 0 ? 'Y' :
                 ZInfo::Bits > 0 ? 'Z' :
                 WInfo::Bits > 0 ? 'W' :
                 '?',
 
-            INDEX_1 =
-                INDEX_0 == '?' ? '?' :
-                INDEX_0 == 'X' && YInfo::Bits > 0 ? 'Y' :
-                INDEX_0 == 'Y' && ZInfo::Bits > 0 ? 'Z' :
-                INDEX_0 == 'Z' && WInfo::Bits > 0 ? 'W' :
+            Index1 =
+                Index0 == '?' ? '?' :
+                Index0 != 'Y' && YInfo::Bits > 0 ? 'Y' :
+                Index0 != 'Z' && ZInfo::Bits > 0 ? 'Z' :
+                Index0 != 'W' && WInfo::Bits > 0 ? 'W' :
                 '?',
 
-            INDEX_2 =
-                INDEX_1 == '?' ? '?' :
-                INDEX_1 == 'Y' && ZInfo::Bits > 0 ? 'Z' :
-                INDEX_1 == 'Z' && WInfo::Bits > 0 ? 'W' :
+            Index2 =
+                Index1 == '?' ? '?' :
+                Index0 != 'Z' && Index1 != 'Z' && ZInfo::Bits > 0 ? 'Z' :
+                Index0 != 'W' && Index1 != 'W' && WInfo::Bits > 0 ? 'W' :
                 '?',
-            INDEX_3 =
-                INDEX_2 == '?' ? '?' :
-                INDEX_2 == 'Z' && WInfo::Bits > 0 ? 'W' :
+
+            Index3 =
+                Index2 == '?' ? '?' :
+                Index0 != 'W' && Index1 != 'W' && Index2 != 'W' && WInfo::Bits > 0 ? 'W' :
                 '?'
         };
     public:
@@ -167,10 +167,10 @@ namespace Solaire { namespace Test {
         */
 	    Scalar operator[](const uint32_t aIndex) const throw() {
 	        switch(aIndex) {
-            case 0  : return INDEX_0 == 'X' ? X : INDEX_0 == 'Y' ? Y : INDEX_0 == 'Z' ? Z : INDEX_0 == 'W' ? W : 0;
-            case 1  : return INDEX_1 == 'Y' ? Y : INDEX_1 == 'Z' ? Z : INDEX_1 == 'W' ? W : 0;
-            case 2  : return INDEX_2 == 'Z' ? Z : INDEX_2 == 'W' ? W : 0;
-            case 3  : return INDEX_3 == 'W' ? W : 0;
+            case 0  : return Index0 == 'X' ? X : Index0 == 'Y' ? Y : Index0 == 'Z' ? Z : Index0 == 'W' ? W : 0;
+            case 1  : return Index1 == 'Y' ? Y : Index1 == 'Z' ? Z : Index1 == 'W' ? W : 0;
+            case 2  : return Index2 == 'Z' ? Z : Index2 == 'W' ? W : 0;
+            case 3  : return Index3 == 'W' ? W : 0;
             default : return 0;
 	        }
 	    }

@@ -33,66 +33,9 @@
 #include <cmath>
 #include <cstdint>
 #include <limits>
+#include "Solaire/Core/BinaryBlock.hpp"
 
 namespace Solaire { namespace Test {
-
-    static constexpr bool binaryBlockFn(const int8_t aBytes, const int8_t aMin, const int8_t aMax) throw() {
-        return aBytes >= aMin && aBytes < aMax;
-    }
-
-    template<const uint32_t BYTES>
-    struct ByteArray {
-    private:
-        uint8_t mBytes[BYTES];
-    };
-
-    template<const uint32_t BYTES, const bool SIGN, typename ENABLE = void>
-    struct BinaryBlockStruct {
-        typedef ByteArray<BYTES> Type;
-    };
-
-    template<const uint32_t BYTES, const bool SIGN>
-    struct BinaryBlockStruct<BYTES, SIGN, typename std::enable_if<binaryBlockFn(BYTES, 33, 65) && ! SIGN>::type> {
-        typedef uint64_t Type;
-    };
-
-    template<const uint32_t BYTES, const bool SIGN>
-    struct BinaryBlockStruct<BYTES, SIGN, typename std::enable_if<binaryBlockFn(BYTES, 17, 33) && ! SIGN>::type> {
-        typedef uint32_t Type;
-    };
-
-    template<const uint32_t BYTES, const bool SIGN>
-    struct BinaryBlockStruct<BYTES, SIGN, typename std::enable_if<binaryBlockFn(BYTES, 9, 17) && ! SIGN>::type> {
-        typedef uint16_t Type;
-    };
-
-    template<const uint32_t BYTES, const bool SIGN>
-    struct BinaryBlockStruct<BYTES, SIGN, typename std::enable_if<binaryBlockFn(BYTES, 0, 9) && ! SIGN>::type> {
-        typedef uint8_t Type;
-    };
-
-    template<const uint32_t BYTES, const bool SIGN>
-    struct BinaryBlockStruct<BYTES, SIGN, typename std::enable_if<binaryBlockFn(BYTES, 33, 65) && SIGN>::type> {
-        typedef int64_t Type;
-    };
-
-    template<const uint32_t BYTES, const bool SIGN>
-    struct BinaryBlockStruct<BYTES, SIGN, typename std::enable_if<binaryBlockFn(BYTES, 17, 33) && SIGN>::type> {
-        typedef int32_t Type;
-    };
-
-    template<const uint32_t BYTES, const bool SIGN>
-    struct BinaryBlockStruct<BYTES, SIGN, typename std::enable_if<binaryBlockFn(BYTES, 9, 17) && SIGN>::type> {
-        typedef int16_t Type;
-    };
-
-    template<const uint32_t BYTES, const bool SIGN>
-    struct BinaryBlockStruct<BYTES, SIGN, typename std::enable_if<binaryBlockFn(BYTES, 0, 9) && SIGN>::type> {
-        typedef int8_t Type;
-    };
-
-    template<const uint32_t BYTES, const bool SIGN>
-    using BinaryBlock = typename BinaryBlockStruct<BYTES, SIGN>::Type;
 
     static constexpr bool isByteAligned(const uint32_t aBits) throw() {
         return (static_cast<float>(aBits) / 8.f) == static_cast<float>(aBits / 8);

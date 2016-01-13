@@ -93,53 +93,38 @@ namespace Solaire { namespace Test {
             XBITS, YBITS, ZBITS, WBITS,
             XSIGN, YSIGN, ZSIGN, WSIGN
         > Self;
-    public:
-        typename XInfo::Type X : XBITS;
-        typename YInfo::Type Y : YBITS;
-        typename ZInfo::Type Z : ZBITS;
-        typename WInfo::Type W : WBITS;
-    private:
+
+
         enum {
-            I0 =
+            INDEX_0 =
                 XInfo::Bits > 0 ? 'X' :
                 YInfo::Bits > 0 ? 'Y' :
                 ZInfo::Bits > 0 ? 'Z' :
                 WInfo::Bits > 0 ? 'W' :
                 '?',
 
-            I1 =
-                I0 == '?' ? '?' :
-                I0 == 'X' && YInfo::Bits > 0 ? 'Y' :
-                I0 == 'Y' && ZInfo::Bits > 0 ? 'Z' :
-                I0 == 'Z' && WInfo::Bits > 0 ? 'W' :
+            INDEX_1 =
+                INDEX_0 == '?' ? '?' :
+                INDEX_0 == 'X' && YInfo::Bits > 0 ? 'Y' :
+                INDEX_0 == 'Y' && ZInfo::Bits > 0 ? 'Z' :
+                INDEX_0 == 'Z' && WInfo::Bits > 0 ? 'W' :
                 '?',
 
-            I2 =
-                I1 == '?' ? '?' :
-                I1 == 'Y' && ZInfo::Bits > 0 ? 'Z' :
-                I1 == 'Z' && WInfo::Bits > 0 ? 'W' :
+            INDEX_2 =
+                INDEX_1 == '?' ? '?' :
+                INDEX_1 == 'Y' && ZInfo::Bits > 0 ? 'Z' :
+                INDEX_1 == 'Z' && WInfo::Bits > 0 ? 'W' :
                 '?',
-            I3 =
-                I2 == '?' ? '?' :
-                I2 == 'Z' && WInfo::Bits > 0 ? 'W' :
+            INDEX_3 =
+                INDEX_2 == '?' ? '?' :
+                INDEX_2 == 'Z' && WInfo::Bits > 0 ? 'W' :
                 '?'
         };
-
-        SOLAIRE_FORCE_INLINE Scalar get0() const throw() {
-            return I0 == 'X' ? X : I0 == 'Y' ? Y : I0 == 'Z' ? Z : I0 == 'W' ? W : 0;
-        }
-
-        SOLAIRE_FORCE_INLINE Scalar get1() const throw() {
-            return I1 == 'Y' ? Y : I1 == 'Z' ? Z : I1 == 'W' ? W : 0;
-        }
-
-        SOLAIRE_FORCE_INLINE Scalar get2() const throw() {
-            return I2 == 'Z' ? Z : I2 == 'W' ? W : 0;
-        }
-
-        SOLAIRE_FORCE_INLINE Scalar get3() const throw() {
-            return I3 == 'W' ? W : 0;
-        }
+    public:
+        typename XInfo::Type X : XBITS;
+        typename YInfo::Type Y : YBITS;
+        typename ZInfo::Type Z : ZBITS;
+        typename WInfo::Type W : WBITS;
     public:
 
         // Constructors
@@ -182,10 +167,10 @@ namespace Solaire { namespace Test {
         */
 	    Scalar operator[](const uint32_t aIndex) const throw() {
 	        switch(aIndex) {
-            case 0  : return get0();
-            case 1  : return get1();
-            case 2  : return get2();
-            case 3  : return get3();
+            case 0  : return INDEX_0 == 'X' ? X : INDEX_0 == 'Y' ? Y : INDEX_0 == 'Z' ? Z : INDEX_0 == 'W' ? W : 0;
+            case 1  : return INDEX_1 == 'Y' ? Y : INDEX_1 == 'Z' ? Z : INDEX_1 == 'W' ? W : 0;
+            case 2  : return INDEX_2 == 'Z' ? Z : INDEX_2 == 'W' ? W : 0;
+            case 3  : return INDEX_3 == 'W' ? W : 0;
             default : return 0;
 	        }
 	    }

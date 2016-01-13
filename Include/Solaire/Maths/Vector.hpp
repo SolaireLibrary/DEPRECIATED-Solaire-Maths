@@ -402,7 +402,7 @@ namespace Solaire {
             \see MagnitudeSquared
         */
 		Scalar magnitude() const throw() {
-			return static_cast<Scalar>(std::sqrt(static_cast<double>(magnitudeSquared(aVector))));
+			return static_cast<Scalar>(std::sqrt(static_cast<double>(magnitudeSquared())));
 		}
 
         /*!

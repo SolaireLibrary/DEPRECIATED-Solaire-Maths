@@ -122,9 +122,10 @@ namespace Solaire { namespace Test {
 
     template<
         const uint8_t XBITS, const uint8_t YBITS, const uint8_t ZBITS, const uint8_t WBITS,
-        const uint8_t XSIGN, const uint8_t YSIGN, const uint8_t ZSIGN, const uint8_t WSIGN
+        const bool XSIGN = false, const bool YSIGN = false, const bool ZSIGN = false, const bool WSIGN = false
     >
-    struct VectorInfo{
+    class CompressedVector {
+    public:
         enum {
             TotalBits = XBITS + YBITS + ZBITS + WBITS,
             IsByteAligned = isByteAligned(TotalBits)

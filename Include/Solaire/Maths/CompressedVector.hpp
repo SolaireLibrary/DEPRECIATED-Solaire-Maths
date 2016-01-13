@@ -115,6 +115,11 @@ namespace Solaire { namespace Test {
         };
         typedef BinaryBlock<BITS, Signed> Type;
 
+        enum : Type {
+            Min = Signed ? (static_cast<int64_t>(MASKS[Bits] / 2) - 1) * -1 : 0,
+            Max = Signed ? MASKS[Bits] / 2 : (MASKS[Bits] + 1)
+        };
+
         static constexpr float scale(const Type aValue) {
             return static_cast<float>(aValue) / static_cast<float>(MASKS[BITS]);
         }
@@ -141,6 +146,32 @@ namespace Solaire { namespace Test {
         typename ZInfo::Type Z : ZBITS;
         typename WInfo::Type W : WBITS;
     };
+
+    template<class T>
+    static void PrintElementInfo(const char aElement) {
+        std::cout << "Info - Element " << aElement << std::endl;
+        std::cout << "Bits\t: " << T::Bits << std::endl;
+        std::cout << "Signed\t: " << T::Signed << std::endl;
+        std::cout << "Type\t: " << sizeof(typename T::Type) << " bytes" << std::endl;
+        std::cout << "Min\t: " << T::Min << std::endl;
+        std::cout << "Max\t: " << T::Max << std::endl;
+
+    }
+
+    template<class T>
+    static void PrintVectorInfo() {
+        std::cout << "Info - Vector" << std::endl;
+        std::cout << "TotalBits\t: " << T::TotalBits << std::endl;
+        std::cout << "IsByteAligned\t: " << T::IsByteAligned << std::endl;
+        std::cout << std::endl;
+        PrintElementInfo<typename T::XInfo>('X');
+        std::cout << std::endl;
+        PrintElementInfo<typename T::YInfo>('Y');
+        std::cout << std::endl;
+        PrintElementInfo<typename T::ZInfo>('Z');
+        std::cout << std::endl;
+        PrintElementInfo<typename T::WInfo>('W');
+    }
 
 }}
 

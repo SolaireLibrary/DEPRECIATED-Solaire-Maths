@@ -98,6 +98,49 @@ namespace Solaire { namespace Test {
         typename YInfo::Type Y : YBITS;
         typename ZInfo::Type Z : ZBITS;
         typename WInfo::Type W : WBITS;
+    private:
+        enum {
+            I0 =
+                XInfo::Bits > 0 ? 'X' :
+                YInfo::Bits > 0 ? 'Y' :
+                ZInfo::Bits > 0 ? 'Z' :
+                WInfo::Bits > 0 ? 'W' :
+                '?',
+
+            I1 =
+                I0 == '?' ? '?' :
+                I0 == 'X' && YInfo::Bits > 0 ? 'Y' :
+                I0 == 'Y' && ZInfo::Bits > 0 ? 'Z' :
+                I0 == 'Z' && WInfo::Bits > 0 ? 'W' :
+                '?',
+
+            I2 =
+                I1 == '?' ? '?' :
+                I1 == 'Y' && ZInfo::Bits > 0 ? 'Z' :
+                I1 == 'Z' && WInfo::Bits > 0 ? 'W' :
+                '?',
+            I3 =
+                I2 == '?' ? '?' :
+                I2 == 'Z' && WInfo::Bits > 0 ? 'W' :
+                '?'
+        };
+
+        SOLAIRE_FORCE_INLINE Scalar get0() const throw() {
+            return I0 == 'X' ? X : I0 == 'Y' ? Y : I0 == 'Z' ? Z : I0 == 'W' ? W : 0;
+        }
+
+        SOLAIRE_FORCE_INLINE Scalar get1() const throw() {
+            return I1 == 'Y' ? Y : I1 == 'Z' ? Z : I1 == 'W' ? W : 0;
+        }
+
+        SOLAIRE_FORCE_INLINE Scalar get2() const throw() {
+            return I2 == 'Z' ? Z : I2 == 'W' ? W : 0;
+        }
+
+        SOLAIRE_FORCE_INLINE Scalar get3() const throw() {
+            return I3 == 'W' ? W : 0;
+        }
+    public:
 
         // Constructors
 
@@ -139,10 +182,10 @@ namespace Solaire { namespace Test {
         */
 	    Scalar operator[](const uint32_t aIndex) const throw() {
 	        switch(aIndex) {
-            case 0  : return X;
-            case 1  : return Y;
-            case 2  : return Z;
-            case 3  : return W;
+            case 0  : return get0();
+            case 1  : return get1();
+            case 2  : return get2();
+            case 3  : return get3();
             default : return 0;
 	        }
 	    }

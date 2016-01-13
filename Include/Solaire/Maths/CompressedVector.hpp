@@ -135,13 +135,11 @@ namespace Solaire { namespace Test {
         typedef ElementInfo<YBITS, YSIGN> YInfo;
         typedef ElementInfo<ZBITS, ZSIGN> ZInfo;
         typedef ElementInfo<WBITS, WSIGN> WInfo;
-
-        struct Type {
-            typename XInfo::Type X : XBITS;
-            typename YInfo::Type Y : YBITS;
-            typename ZInfo::Type Z : ZBITS;
-            typename WInfo::Type W : WBITS;
-        };
+    public:
+        typename XInfo::Type X : XBITS;
+        typename YInfo::Type Y : YBITS;
+        typename ZInfo::Type Z : ZBITS;
+        typename WInfo::Type W : WBITS;
     };
 
 }}

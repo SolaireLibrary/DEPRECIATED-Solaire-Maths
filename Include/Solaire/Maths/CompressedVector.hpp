@@ -45,20 +45,33 @@ namespace Solaire { namespace Test {
         uint8_t mBytes[BYTES];
     };
 
-   // template<const uint32_t BYTES, typename ENABLE = typename std::enable_if<binaryBlockFn(BYTES, 65, INT8_MAX)>::type>
-    //using BinaryBlock = ByteArray<BYTES>;
+    template<const uint32_t BYTES, typename ENABLE = void>
+    struct BinaryBlockStruct {
+        typedef ByteArray<BYTES> Type;
+    };
 
-   // template<const uint32_t BYTES, typename ENABLE = typename std::enable_if<binaryBlockFn(BYTES, 33, 64)>::type>
-    //using BinaryBlock = uint64_t;
+    template<const uint32_t BYTES>
+    struct BinaryBlockStruct<BYTES, typename std::enable_if<binaryBlockFn(BYTES, 33, 65)>::type> {
+        typedef uint64_t Type;
+    };
 
-    template<const uint32_t BYTES, typename ENABLE = typename std::enable_if<binaryBlockFn(BYTES, 17, 32)>::type>
-    using BinaryBlock = uint32_t;
+    template<const uint32_t BYTES>
+    struct BinaryBlockStruct<BYTES, typename std::enable_if<binaryBlockFn(BYTES, 17, 33)>::type> {
+        typedef uint32_t Type;
+    };
 
-    //template<const uint32_t BYTES, typename ENABLE = typename std::enable_if<binaryBlockFn(BYTES, 9, 16)>::type>
-    //using BinaryBlock = uint16_t;
+    template<const uint32_t BYTES>
+    struct BinaryBlockStruct<BYTES, typename std::enable_if<binaryBlockFn(BYTES, 9, 17)>::type> {
+        typedef uint16_t Type;
+    };
 
-    //template<const uint32_t BYTES, typename ENABLE = typename std::enable_if<binaryBlockFn(BYTES, 0, 8)>::type>
-    //using BinaryBlock = uint8_t;
+    template<const uint32_t BYTES>
+    struct BinaryBlockStruct<BYTES, typename std::enable_if<binaryBlockFn(BYTES, 0, 9)>::type> {
+        typedef uint8_t Type;
+    };
+
+    template<const uint32_t BYTES>
+    using BinaryBlock = typename BinaryBlockStruct<BYTES>::Type;
 
     static constexpr bool isByteAligned(const uint32_t aBits) throw() {
         return (static_cast<float>(aBits) / 8.f) == static_cast<float>(aBits / 8);

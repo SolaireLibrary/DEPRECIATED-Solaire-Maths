@@ -34,6 +34,7 @@
 #include <cstdint>
 #include <cstring>
 #include <initializer_list>
+#include "Solaire/Core/ModuleHeader.hpp"
 
 namespace Solaire {
 
@@ -67,6 +68,60 @@ namespace Solaire {
 		};
     private:
         Scalar mData[Length];   //!< Stores the scalar elements of this Vector.
+    public:
+        Scalar getX() const throw() {
+            return mData[0];
+        }
+
+        Scalar& getX() throw() {
+            return mData[0];
+        }
+
+        void setX(const Scalar aScalar) throw() {
+            mData[0] = aScalar;
+        }
+
+        Scalar getY() const throw() {
+            return mData[1];
+        }
+
+        Scalar& getY() throw() {
+            return mData[1];
+        }
+
+        void setY(const Scalar aScalar) throw() {
+            mData[1] = aScalar;
+        }
+
+        Scalar getZ() const throw() {
+            return mData[2];
+        }
+
+        Scalar& getZ() throw() {
+            return mData[2];
+        }
+
+        void setZ(const Scalar aScalar) throw() {
+            mData[2] = aScalar;
+        }
+
+        Scalar getW() const throw() {
+            return mData[3];
+        }
+
+        Scalar& getW() throw() {
+            return mData[3];
+        }
+
+        void setW(const Scalar aScalar) throw() {
+            mData[3] = aScalar;
+        }
+    #if SOLAIRE_COMPILER == SOLAIRE_MSVC
+        __declspec(property(get = getX, put = setX)) Scalar X;
+        __declspec(property(get = getY, put = setY)) Scalar Y;
+        __declspec(property(get = getZ, put = setZ)) Scalar Z;
+        __declspec(property(get = getW, put = setW)) Scalar W;
+    #endif
 	public:
 	    // Constructors & Destructor
 

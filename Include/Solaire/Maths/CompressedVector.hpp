@@ -45,33 +45,53 @@ namespace Solaire { namespace Test {
         uint8_t mBytes[BYTES];
     };
 
-    template<const uint32_t BYTES, typename ENABLE = void>
+    template<const uint32_t BYTES, const bool SIGN, typename ENABLE = void>
     struct BinaryBlockStruct {
         typedef ByteArray<BYTES> Type;
     };
 
-    template<const uint32_t BYTES>
-    struct BinaryBlockStruct<BYTES, typename std::enable_if<binaryBlockFn(BYTES, 33, 65)>::type> {
+    template<const uint32_t BYTES, const bool SIGN>
+    struct BinaryBlockStruct<BYTES, SIGN, typename std::enable_if<binaryBlockFn(BYTES, 33, 65) && ! SIGN>::type> {
         typedef uint64_t Type;
     };
 
-    template<const uint32_t BYTES>
-    struct BinaryBlockStruct<BYTES, typename std::enable_if<binaryBlockFn(BYTES, 17, 33)>::type> {
+    template<const uint32_t BYTES, const bool SIGN>
+    struct BinaryBlockStruct<BYTES, SIGN, typename std::enable_if<binaryBlockFn(BYTES, 17, 33) && ! SIGN>::type> {
         typedef uint32_t Type;
     };
 
-    template<const uint32_t BYTES>
-    struct BinaryBlockStruct<BYTES, typename std::enable_if<binaryBlockFn(BYTES, 9, 17)>::type> {
+    template<const uint32_t BYTES, const bool SIGN>
+    struct BinaryBlockStruct<BYTES, SIGN, typename std::enable_if<binaryBlockFn(BYTES, 9, 17) && ! SIGN>::type> {
         typedef uint16_t Type;
     };
 
-    template<const uint32_t BYTES>
-    struct BinaryBlockStruct<BYTES, typename std::enable_if<binaryBlockFn(BYTES, 0, 9)>::type> {
+    template<const uint32_t BYTES, const bool SIGN>
+    struct BinaryBlockStruct<BYTES, SIGN, typename std::enable_if<binaryBlockFn(BYTES, 0, 9) && ! SIGN>::type> {
         typedef uint8_t Type;
     };
 
-    template<const uint32_t BYTES>
-    using BinaryBlock = typename BinaryBlockStruct<BYTES>::Type;
+    template<const uint32_t BYTES, const bool SIGN>
+    struct BinaryBlockStruct<BYTES, SIGN, typename std::enable_if<binaryBlockFn(BYTES, 33, 65) && SIGN>::type> {
+        typedef int64_t Type;
+    };
+
+    template<const uint32_t BYTES, const bool SIGN>
+    struct BinaryBlockStruct<BYTES, SIGN, typename std::enable_if<binaryBlockFn(BYTES, 17, 33) && SIGN>::type> {
+        typedef int32_t Type;
+    };
+
+    template<const uint32_t BYTES, const bool SIGN>
+    struct BinaryBlockStruct<BYTES, SIGN, typename std::enable_if<binaryBlockFn(BYTES, 9, 17) && SIGN>::type> {
+        typedef int16_t Type;
+    };
+
+    template<const uint32_t BYTES, const bool SIGN>
+    struct BinaryBlockStruct<BYTES, SIGN, typename std::enable_if<binaryBlockFn(BYTES, 0, 9) && SIGN>::type> {
+        typedef int8_t Type;
+    };
+
+    template<const uint32_t BYTES, const bool SIGN>
+    using BinaryBlock = typename BinaryBlockStruct<BYTES, SIGN>::Type;
 
     static constexpr bool isByteAligned(const uint32_t aBits) throw() {
         return (static_cast<float>(aBits) / 8.f) == static_cast<float>(aBits / 8);
@@ -87,49 +107,40 @@ namespace Solaire { namespace Test {
 
     ////
 
-    template<const uint8_t BITS, const uint8_t OFFSET>
+    template<const uint8_t BITS, const bool SIGN>
     struct ElementInfo {
         enum : uint64_t {
             Bits = BITS,
-            Offset = OFFSET,
-            IsByteAligned = isByteAligned(Offset),
+            Signed = SIGN
         };
-        typedef BinaryBlock<BITS> Type;
+        typedef BinaryBlock<BITS, Signed> Type;
+
+        static constexpr float scale(const Type aValue) {
+            return static_cast<float>(aValue) / static_cast<float>(MASKS[BITS]);
+        }
     };
 
-    template<const uint8_t XBITS, const uint8_t YBITS, const uint8_t ZBITS, const uint8_t WBITS>
+    template<
+        const uint8_t XBITS, const uint8_t YBITS, const uint8_t ZBITS, const uint8_t WBITS,
+        const uint8_t XSIGN, const uint8_t YSIGN, const uint8_t ZSIGN, const uint8_t WSIGN
+    >
     struct VectorInfo{
         enum {
             TotalBits = XBITS + YBITS + ZBITS + WBITS,
             IsByteAligned = isByteAligned(TotalBits)
         };
 
+        typedef ElementInfo<XBITS, XSIGN> XInfo;
+        typedef ElementInfo<YBITS, YSIGN> YInfo;
+        typedef ElementInfo<ZBITS, ZSIGN> ZInfo;
+        typedef ElementInfo<WBITS, WSIGN> WInfo;
+
         struct Type {
-            uint8_t X : XBITS;
-            uint8_t Y : YBITS;
-            uint8_t Z : ZBITS;
-            uint8_t W : WBITS;
+            typename XInfo::Type X : XBITS;
+            typename YInfo::Type Y : YBITS;
+            typename ZInfo::Type Z : ZBITS;
+            typename WInfo::Type W : WBITS;
         };
-
-        typedef ElementInfo<
-            XBITS,
-            0
-        > X;
-
-        typedef ElementInfo<
-            YBITS,
-            XBITS
-        > Y;
-
-        typedef ElementInfo<
-            ZBITS,
-            XBITS + YBITS
-        > Z;
-
-        typedef ElementInfo<
-            WBITS,
-            XBITS + YBITS + ZBITS
-        > W;
     };
 
 }}

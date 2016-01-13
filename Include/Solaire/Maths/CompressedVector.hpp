@@ -77,23 +77,23 @@ namespace Solaire { namespace Test {
         return (static_cast<float>(aBits) / 8.f) == static_cast<float>(aBits / 8);
     }
 
-    static constexpr uint8_t MASKS[8] = {
-        0x01, 0x03, 0x07, 0x0F,
-        0x1F, 0x3F, 0x7F, 0xFF
+    static constexpr uint64_t MASKS[33] = {
+        0x00,
+        0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF,                         // 8 bit
+        0x01F, 0x03F, 0x07F, 0x0FF, 0x1FF, 0x3FF, 0x7F, 0xFFF,                  // 16 bit
+        0x01FF, 0x03FF, 0x07FF, 0x0FFF, 0x1FFF, 0x3FFF, 0x7FF, 0xFFFF,          // 32 bit
+        0x01FFF, 0x03FFF, 0x07FFF, 0x0FFFF, 0x1FFFF, 0x3FFFF, 0x7FFF, 0xFFFFF,  // 64 bit
     };
-
-    static constexpr uint64_t generateMask(const uint64_t aOffset, const uint8_t aBits) throw() {
-        return static_cast<uint64_t>(MASKS[aBits]) << aOffset;
-    }
 
     ////
 
-    template<const uint8_t BITS, const bool BYTE_ALIGNED, uint64_t MASK>
+    template<const uint8_t BITS, const uint8_t OFFSET>
     struct ElementInfo {
         enum : uint64_t {
             Bits = BITS,
-            IsByteAligned = BYTE_ALIGNED,
-            Mask = MASK
+            Offset = OFFSET,
+            IsByteAligned = isByteAligned(Offset),
+            Mask = static_cast<uint64_t>(MASKS[Bits]) << Offset
         };
         typedef BinaryBlock<BITS> Type;
     };
@@ -101,32 +101,29 @@ namespace Solaire { namespace Test {
     template<const uint8_t XBITS, const uint8_t YBITS, const uint8_t ZBITS, const uint8_t WBITS>
     struct VectorInfo{
         enum {
-            TotalBits = XBITS + YBITS + ZBITS + WBITS
+            TotalBits = XBITS + YBITS + ZBITS + WBITS,
+            IsByteAligned = isByteAligned(TotalBits)
         };
         typedef BinaryBlock<TotalBits> Type;
 
         typedef ElementInfo<
             XBITS,
-            isByteAligned(TotalBits),
-            generateMask(0, XBITS)
+            0
         > X;
 
         typedef ElementInfo<
             YBITS,
-            isByteAligned(TotalBits) && isByteAligned(XBITS),
-            generateMask(XBITS, YBITS)
+            XBITS
         > Y;
 
         typedef ElementInfo<
             ZBITS,
-            isByteAligned(TotalBits) && isByteAligned(XBITS + YBITS),
-            generateMask(XBITS + YBITS, ZBITS)
+            XBITS + YBITS
         > Z;
 
         typedef ElementInfo<
             WBITS,
-            isByteAligned(TotalBits) && isByteAligned(XBITS + YBITS + ZBITS),
-            generateMask(XBITS + YBITS + ZBITS, WBITS)
+            XBITS + YBITS + ZBITS
         > W;
     };
 

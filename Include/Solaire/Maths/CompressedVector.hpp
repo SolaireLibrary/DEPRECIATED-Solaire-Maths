@@ -155,7 +155,7 @@ namespace Solaire { namespace Test {
     };
 
     template<class A, class B>
-    struct IntegerContainerStruct<A, B, typename std::enable_if<canIntegerContain<B,A>()>::type> {
+    struct IntegerContainerStruct<A, B, typename std::enable_if<canIntegerContain<B,A>() && ! canIntegerContain<A,B>()>::type> {
         typedef B Type;
     };
 
@@ -227,8 +227,7 @@ namespace Solaire { namespace Test {
         typedef ElementInfo<ZBITS, ZSIGN> ZInfo;
         typedef ElementInfo<WBITS, WSIGN> WInfo;
 
-        //typedef IntegerContainer4<typename XInfo::Type, typename YInfo::Type, typename ZInfo::Type, typename WInfo::Type> Scalar;
-        typedef int Scalar;
+        typedef IntegerContainer4<typename XInfo::Type, typename YInfo::Type, typename ZInfo::Type, typename WInfo::Type> Scalar;
 
         typedef CompressedVector<
             XBITS, YBITS, ZBITS, WBITS,

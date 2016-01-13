@@ -107,6 +107,36 @@ namespace Solaire { namespace Test {
 
     ////
 
+    template<class A, class B>
+    static constexpr bool classLargerThan() {
+        return sizeof(A) > sizeof(B);
+    }
+
+    template<class A, class B, typename ENABLE = void>
+    struct LargerClass {
+        typedef B Type;
+    };
+
+    template<class A, class B>
+    struct LargerClass<A, B, typename std::enable_if<classLargerThan<A,B>()>::type> {
+        typedef A Type;
+    };
+
+    template<class XINFO, class YINFO, class ZINFO, class WINFO>
+    struct CompressedVectorLargeScalarStruct {
+        typedef typename LargerClass<typename XINFO::Type, typename YINFO::Type>::Type XY;
+        typedef typename LargerClass<typename YINFO::Type, typename WINFO::Type>::Type ZW;
+
+        typedef typename LargerClass<XY, ZW>::Type Type;
+    };
+
+    //! \todo handle signef types with CompressedVectorLargeScalarStruct
+
+    template<class XINFO, class YINFO, class ZINFO, class WINFO>
+    using CompressedVectorLargeScalar = typename CompressedVectorLargeScalarStruct<XINFO, YINFO, ZINFO, WINFO>::Type;
+
+    ////
+
     template<const uint8_t BITS, const bool SIGN>
     struct ElementInfo {
         enum : uint64_t {
@@ -134,7 +164,7 @@ namespace Solaire { namespace Test {
         enum {
             TotalBits = XBITS + YBITS + ZBITS + WBITS,
             IsByteAligned = isByteAligned(TotalBits),
-            Size = 4 // !< \todo Implement length
+            Size = (XBITS == 0 ? 0 : 1) + (YBITS == 0 ? 0 : 1) + (ZBITS == 0 ? 0 : 1) + (WBITS == 0 ? 0 : 1)
         };
 
         typedef ElementInfo<XBITS, XSIGN> XInfo;
@@ -142,7 +172,7 @@ namespace Solaire { namespace Test {
         typedef ElementInfo<ZBITS, ZSIGN> ZInfo;
         typedef ElementInfo<WBITS, WSIGN> WInfo;
 
-        typedef int LargeScalar; //! \todo Implement this
+        typedef CompressedVectorLargeScalar<XInfo, YInfo, ZInfo, WInfo> LargeScalar;
 
         typedef CompressedVector<
             XBITS, YBITS, ZBITS, WBITS,

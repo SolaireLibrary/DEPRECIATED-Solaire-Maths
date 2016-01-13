@@ -32,6 +32,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <limits>
 
 namespace Solaire { namespace Test {
 
@@ -107,33 +108,87 @@ namespace Solaire { namespace Test {
 
     ////
 
+    template<class T, const bool SIGN, typename ENABLE = void>
+    struct BiggerIntegerStruct {
+        typedef void Type;
+    };
+
+    #define SOLAIRE_BIGGER_INTEGER_STRUCT(aType, aSignedType, aUnsignedType)\
+    template<class T, const bool SIGN>\
+    struct BiggerIntegerStruct<T, SIGN, typename std::enable_if<std::is_same<T, aType>::value && ! SIGN>::type> {\
+        typedef aUnsignedType Type;\
+    };\
+    template<class T, const bool SIGN>\
+    struct BiggerIntegerStruct<T, SIGN, typename std::enable_if<std::is_same<T, aType>::value && SIGN>::type> {\
+        typedef aSignedType Type;\
+    };
+
+    SOLAIRE_BIGGER_INTEGER_STRUCT(uint8_t,  uint16_t,   int16_t);
+    SOLAIRE_BIGGER_INTEGER_STRUCT(uint16_t, uint32_t,   int32_t);
+    SOLAIRE_BIGGER_INTEGER_STRUCT(uint32_t, uint64_t,   int64_t);
+    SOLAIRE_BIGGER_INTEGER_STRUCT(uint64_t, uint64_t,   int64_t);
+    SOLAIRE_BIGGER_INTEGER_STRUCT(int8_t,   uint8_t,    int16_t);
+    SOLAIRE_BIGGER_INTEGER_STRUCT(int16_t,  uint16_t,   int32_t);
+    SOLAIRE_BIGGER_INTEGER_STRUCT(int32_t,  uint32_t,   int64_t);
+    SOLAIRE_BIGGER_INTEGER_STRUCT(int64_t,  uint64_t,   int64_t);
+
+    template<class T, const bool SIGN>
+    using BiggerInteger = typename BiggerIntegerStruct<T, SIGN>::Type;
+
     template<class A, class B>
-    static constexpr bool classLargerThan() {
-        return sizeof(A) > sizeof(B);
+    static constexpr bool canIntegerContain() {
+        static_assert(std::is_integral<A>::value, "SolaireCPP : canIntegerContain<A> must be integer type");
+        static_assert(std::is_integral<B>::value, "SolaireCPP : canIntegerContain<B> must be integer type");
+        return
+            (std::numeric_limits<A>::min() <= std::numeric_limits<B>::min()) &&
+            (std::numeric_limits<A>::max() >= std::numeric_limits<B>::max());
     }
 
     template<class A, class B, typename ENABLE = void>
-    struct LargerClass {
+    struct IntegerContainerStruct {
+        typedef void Type;
+    };
+
+    template<class A, class B>
+    struct IntegerContainerStruct<A, B, typename std::enable_if<canIntegerContain<A,B>()>::type> {
+        typedef A Type;
+    };
+
+    template<class A, class B>
+    struct IntegerContainerStruct<A, B, typename std::enable_if<canIntegerContain<B,A>()>::type> {
         typedef B Type;
     };
 
     template<class A, class B>
-    struct LargerClass<A, B, typename std::enable_if<classLargerThan<A,B>()>::type> {
-        typedef A Type;
+    struct IntegerContainerStruct<A, B, typename std::enable_if<
+        ((! canIntegerContain<A,B>()) && (! canIntegerContain<B,A>())) &&
+        (
+            canIntegerContain<BiggerInteger<A, std::is_signed<A>::value>, A>() &&
+            canIntegerContain<BiggerInteger<A, std::is_signed<A>::value>, B>()
+         )
+    >::type> {
+        typedef BiggerInteger<A, std::is_signed<A>::value> Type;
     };
 
-    template<class XINFO, class YINFO, class ZINFO, class WINFO>
-    struct CompressedVectorLargeScalarStruct {
-        typedef typename LargerClass<typename XINFO::Type, typename YINFO::Type>::Type XY;
-        typedef typename LargerClass<typename YINFO::Type, typename WINFO::Type>::Type ZW;
-
-        typedef typename LargerClass<XY, ZW>::Type Type;
+    template<class A, class B>
+    struct IntegerContainerStruct<A, B, typename std::enable_if<
+        ((! canIntegerContain<A,B>()) && (! canIntegerContain<B,A>())) &&
+        (
+            canIntegerContain<BiggerInteger<B, std::is_signed<B>::value>, A>() &&
+            canIntegerContain<BiggerInteger<B, std::is_signed<B>::value>, B>()
+         )
+    >::type> {
+        typedef BiggerInteger<B, std::is_signed<B>::value> Type;
     };
 
-    //! \todo handle signef types with CompressedVectorLargeScalarStruct
+    template<class A, class B>
+    using IntegerContainer2 = typename IntegerContainerStruct<A, B>::Type;
 
-    template<class XINFO, class YINFO, class ZINFO, class WINFO>
-    using CompressedVectorLargeScalar = typename CompressedVectorLargeScalarStruct<XINFO, YINFO, ZINFO, WINFO>::Type;
+    template<class A, class B, class C>
+    using IntegerContainer3 = typename IntegerContainerStruct<IntegerContainer2<A, B>, C>::Type;
+
+    template<class A, class B, class C, class D>
+    using IntegerContainer4 = IntegerContainer2<IntegerContainer2<A, B>, IntegerContainer2<C, D>>;
 
     ////
 
@@ -172,7 +227,8 @@ namespace Solaire { namespace Test {
         typedef ElementInfo<ZBITS, ZSIGN> ZInfo;
         typedef ElementInfo<WBITS, WSIGN> WInfo;
 
-        typedef CompressedVectorLargeScalar<XInfo, YInfo, ZInfo, WInfo> LargeScalar;
+        //typedef IntegerContainer4<typename XInfo::Type, typename YInfo::Type, typename ZInfo::Type, typename WInfo::Type> Scalar;
+        typedef int Scalar;
 
         typedef CompressedVector<
             XBITS, YBITS, ZBITS, WBITS,
@@ -193,21 +249,21 @@ namespace Solaire { namespace Test {
             W(0)
         {}
 
-        CompressedVector(const LargeScalar aX, const LargeScalar aY) :
+        CompressedVector(const Scalar aX, const Scalar aY) :
             X(aX),
             Y(aY),
             Z(0),
             W(0)
         {}
 
-        CompressedVector(const LargeScalar aX, const LargeScalar aY, const LargeScalar aZ) :
+        CompressedVector(const Scalar aX, const Scalar aY, const Scalar aZ) :
             X(aX),
             Y(aY),
             Z(aZ),
             W(0)
         {}
 
-        CompressedVector(const LargeScalar aX, const LargeScalar aY, const LargeScalar aZ, const LargeScalar aW) :
+        CompressedVector(const Scalar aX, const Scalar aY, const Scalar aZ, const Scalar aW) :
             X(aX),
             Y(aY),
             Z(aZ),
@@ -222,7 +278,7 @@ namespace Solaire { namespace Test {
             \param aIndex The element to access.
             \return A copy of the scalar element.
         */
-	    LargeScalar operator[](const uint32_t aIndex) const throw() {
+	    Scalar operator[](const uint32_t aIndex) const throw() {
 	        switch(aIndex) {
             case 0  : return X;
             case 1  : return Y;
@@ -296,7 +352,7 @@ namespace Solaire { namespace Test {
             \brief Calculate the sum of all elements in the vector.
             \return The sum.
         */
-		LargeScalar sum() const throw() {
+		Scalar sum() const throw() {
 			return X + Y + Z + W;
 		}
 
@@ -304,7 +360,7 @@ namespace Solaire { namespace Test {
             \brief Calculate the mean element in the vector.
             \return The mean element.
         */
-		LargeScalar average() const throw() {
+		Scalar average() const throw() {
 			return sum() / Size;
 		}
 
@@ -314,7 +370,7 @@ namespace Solaire { namespace Test {
             \return The square of the magnitude.
             \see Magnitude
         */
-       LargeScalar magnitudeSquared() const throw() {
+       Scalar magnitudeSquared() const throw() {
 			return (X * X) + (Y * Y) + (Z * Z) + (W * W);
 		}
 
@@ -323,8 +379,8 @@ namespace Solaire { namespace Test {
             \return The magnitude.
             \see MagnitudeSquared
         */
-		LargeScalar magnitude() const throw() {
-			return static_cast<LargeScalar>(std::sqrt(static_cast<double>(magnitudeSquared())));
+		Scalar magnitude() const throw() {
+			return static_cast<Scalar>(std::sqrt(static_cast<double>(magnitudeSquared())));
 		}
 
         /*!
@@ -340,7 +396,7 @@ namespace Solaire { namespace Test {
             \param aOther The second vector.
             \return The dot product.
         */
-		LargeScalar dotProduct(const Self aOther) const throw() {
+		Scalar dotProduct(const Self aOther) const throw() {
 			return (X * aOther.X) + (Y * aOther.Y) + (Z * aOther.Z) + (W * aOther.W);
 		}
 
@@ -366,10 +422,10 @@ namespace Solaire { namespace Test {
         */
 		Self lerp(const Self aOther, const double aWeight) const throw() {
 			return Self(
-               static_cast<LargeScalar>((1.0 - aWeight) * static_cast<double>(X) + aWeight * static_cast<double>(aOther.X)),
-               static_cast<LargeScalar>((1.0 - aWeight) * static_cast<double>(Y) + aWeight * static_cast<double>(aOther.Y)),
-               static_cast<LargeScalar>((1.0 - aWeight) * static_cast<double>(Z) + aWeight * static_cast<double>(aOther.Z)),
-               static_cast<LargeScalar>((1.0 - aWeight) * static_cast<double>(W) + aWeight * static_cast<double>(aOther.W))
+               static_cast<Scalar>((1.0 - aWeight) * static_cast<double>(X) + aWeight * static_cast<double>(aOther.X)),
+               static_cast<Scalar>((1.0 - aWeight) * static_cast<double>(Y) + aWeight * static_cast<double>(aOther.Y)),
+               static_cast<Scalar>((1.0 - aWeight) * static_cast<double>(Z) + aWeight * static_cast<double>(aOther.Z)),
+               static_cast<Scalar>((1.0 - aWeight) * static_cast<double>(W) + aWeight * static_cast<double>(aOther.W))
             );
 		}
 

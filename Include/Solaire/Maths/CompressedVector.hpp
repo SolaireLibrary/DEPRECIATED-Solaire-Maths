@@ -34,6 +34,7 @@
 #include <cstdint>
 #include <limits>
 #include "Solaire/Core/BinaryBlock.hpp"
+#include "Solaire/Core/IntegerContainer.hpp"
 
 namespace Solaire { namespace Test {
 
@@ -48,90 +49,6 @@ namespace Solaire { namespace Test {
         0x01FF, 0x03FF, 0x07FF, 0x0FFF, 0x1FFF, 0x3FFF, 0x7FF, 0xFFFF,          // 32 bit
         0x01FFF, 0x03FFF, 0x07FFF, 0x0FFFF, 0x1FFFF, 0x3FFFF, 0x7FFF, 0xFFFFF,  // 64 bit
     };
-
-    ////
-
-    template<class T, const bool SIGN, typename ENABLE = void>
-    struct BiggerIntegerStruct {
-        typedef void Type;
-    };
-
-    #define SOLAIRE_BIGGER_INTEGER_STRUCT(aType, aSignedType, aUnsignedType)\
-    template<class T, const bool SIGN>\
-    struct BiggerIntegerStruct<T, SIGN, typename std::enable_if<std::is_same<T, aType>::value && ! SIGN>::type> {\
-        typedef aUnsignedType Type;\
-    };\
-    template<class T, const bool SIGN>\
-    struct BiggerIntegerStruct<T, SIGN, typename std::enable_if<std::is_same<T, aType>::value && SIGN>::type> {\
-        typedef aSignedType Type;\
-    };
-
-    SOLAIRE_BIGGER_INTEGER_STRUCT(uint8_t,  uint16_t,   int16_t);
-    SOLAIRE_BIGGER_INTEGER_STRUCT(uint16_t, uint32_t,   int32_t);
-    SOLAIRE_BIGGER_INTEGER_STRUCT(uint32_t, uint64_t,   int64_t);
-    SOLAIRE_BIGGER_INTEGER_STRUCT(uint64_t, uint64_t,   int64_t);
-    SOLAIRE_BIGGER_INTEGER_STRUCT(int8_t,   uint8_t,    int16_t);
-    SOLAIRE_BIGGER_INTEGER_STRUCT(int16_t,  uint16_t,   int32_t);
-    SOLAIRE_BIGGER_INTEGER_STRUCT(int32_t,  uint32_t,   int64_t);
-    SOLAIRE_BIGGER_INTEGER_STRUCT(int64_t,  uint64_t,   int64_t);
-
-    template<class T, const bool SIGN>
-    using BiggerInteger = typename BiggerIntegerStruct<T, SIGN>::Type;
-
-    template<class A, class B>
-    static constexpr bool canIntegerContain() {
-        static_assert(std::is_integral<A>::value, "SolaireCPP : canIntegerContain<A> must be integer type");
-        static_assert(std::is_integral<B>::value, "SolaireCPP : canIntegerContain<B> must be integer type");
-        return
-            (std::numeric_limits<A>::min() <= std::numeric_limits<B>::min()) &&
-            (std::numeric_limits<A>::max() >= std::numeric_limits<B>::max());
-    }
-
-    template<class A, class B, typename ENABLE = void>
-    struct IntegerContainerStruct {
-        typedef void Type;
-    };
-
-    template<class A, class B>
-    struct IntegerContainerStruct<A, B, typename std::enable_if<canIntegerContain<A,B>()>::type> {
-        typedef A Type;
-    };
-
-    template<class A, class B>
-    struct IntegerContainerStruct<A, B, typename std::enable_if<canIntegerContain<B,A>() && ! canIntegerContain<A,B>()>::type> {
-        typedef B Type;
-    };
-
-    template<class A, class B>
-    struct IntegerContainerStruct<A, B, typename std::enable_if<
-        ((! canIntegerContain<A,B>()) && (! canIntegerContain<B,A>())) &&
-        (
-            canIntegerContain<BiggerInteger<A, std::is_signed<A>::value>, A>() &&
-            canIntegerContain<BiggerInteger<A, std::is_signed<A>::value>, B>()
-         )
-    >::type> {
-        typedef BiggerInteger<A, std::is_signed<A>::value> Type;
-    };
-
-    template<class A, class B>
-    struct IntegerContainerStruct<A, B, typename std::enable_if<
-        ((! canIntegerContain<A,B>()) && (! canIntegerContain<B,A>())) &&
-        (
-            canIntegerContain<BiggerInteger<B, std::is_signed<B>::value>, A>() &&
-            canIntegerContain<BiggerInteger<B, std::is_signed<B>::value>, B>()
-         )
-    >::type> {
-        typedef BiggerInteger<B, std::is_signed<B>::value> Type;
-    };
-
-    template<class A, class B>
-    using IntegerContainer2 = typename IntegerContainerStruct<A, B>::Type;
-
-    template<class A, class B, class C>
-    using IntegerContainer3 = typename IntegerContainerStruct<IntegerContainer2<A, B>, C>::Type;
-
-    template<class A, class B, class C, class D>
-    using IntegerContainer4 = IntegerContainer2<IntegerContainer2<A, B>, IntegerContainer2<C, D>>;
 
     ////
 
